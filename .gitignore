@@ -1,0 +1,25 @@
+# System files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies (if any added later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs (if any added later)
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

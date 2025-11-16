@@ -1,76 +1,194 @@
-<!doctype html>
-<div class="hero-text">
-<h1>Hi, I'm <span class="accent">Your Name</span></h1>
-<p class="lead">Front-end developer & UI builder.</p>
-<a class="btn" href="#projects">View Projects</a>
-</div>
-<div class="hero-image">
-<img src="assets/hero.jpg" alt="Hero image">
-</div>
-</div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional Portfolio - Front-end Developer & UI Builder">
+    <title>Roshni Stephen - Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Particle Background Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <nav class="container">
+            <div class="nav-wrapper">
+                <div class="logo">Roshni Stephen</div>
+                <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul id="main-nav" class="nav">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-inner">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Hi, I'm <span class="accent">Roshni Stephen</span></h1>
+                        <p class="hero-subtitle">Front-end Developer & UI Builder</p>
+                        <p class="hero-description">Crafting beautiful and functional web experiences with modern technologies</p>
+                        <div class="hero-buttons">
+                            <a class="btn btn-primary" href="#projects">View Projects</a>
+                            <a class="btn btn-secondary" href="#contact">Get In Touch</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
-<!-- Skills -->
-<section id="skills" class="container section">
-<h2>Skills</h2>
-<div class="skills-grid">
-<div class="skill"><h3>HTML</h3></div>
-<div class="skill"><h3>CSS</h3></div>
-<div class="skill"><h3>JavaScript</h3></div>
-<div class="skill"><h3>Flutter</h3></div>
-</div>
-</section>
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p class="about-intro">Hello! I'm a passionate front-end developer who loves building clean, intuitive user interfaces and creating exceptional user experiences.</p>
+                        <p>With expertise in modern web technologies, I focus on creating responsive, accessible, and performant web applications. I believe in writing clean, maintainable code and staying up-to-date with the latest industry trends.</p>
+                        <p>When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or sharing knowledge with the developer community.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <div class="container">
+                <h2 class="section-title">Skills & Technologies</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <div class="skill-icon">🌐</div>
+                        <h3>HTML5</h3>
+                        <p>Semantic markup and accessibility-focused development</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">🎨</div>
+                        <h3>CSS3</h3>
+                        <p>Modern layouts, animations, and responsive design</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">⚡</div>
+                        <h3>JavaScript</h3>
+                        <p>ES6+, DOM manipulation, and asynchronous programming</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">📱</div>
+                        <h3>Flutter</h3>
+                        <p>Cross-platform mobile app development</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">🔧</div>
+                        <h3>Git & GitHub</h3>
+                        <p>Version control and collaborative development</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">🚀</div>
+                        <h3>Web Performance</h3>
+                        <p>Optimization and best practices</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
-<!-- Projects -->
-<section id="projects" class="container section">
-<h2>Projects</h2>
-<div class="projects-grid">
-<div class="project-card">
-<img src="assets/project1.jpg"/>
-<h3>Project One</h3>
-</div>
+        <!-- Projects Section -->
+        <section id="projects" class="section section-dark">
+            <div class="container">
+                <h2 class="section-title">Featured Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="project-placeholder">🎨</div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Portfolio Website</h3>
+                            <p>A modern, responsive portfolio website with animated background and smooth interactions</p>
+                            <div class="project-tags">
+                                <span class="tag">HTML</span>
+                                <span class="tag">CSS</span>
+                                <span class="tag">JavaScript</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="project-placeholder">📱</div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Mobile App Design</h3>
+                            <p>Cross-platform mobile application with intuitive UI and seamless user experience</p>
+                            <div class="project-tags">
+                                <span class="tag">Flutter</span>
+                                <span class="tag">Dart</span>
+                                <span class="tag">UI/UX</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">
+                            <div class="project-placeholder">🌐</div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Web Application</h3>
+                            <p>Feature-rich web application with modern architecture and clean code</p>
+                            <div class="project-tags">
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">CSS Grid</span>
+                                <span class="tag">Responsive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
-<div class="project-card">
-<img src="assets/project2.jpg"/>
-<h3>Project Two</h3>
-</div>
-</div>
-</section>
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <div class="container">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="contact-content">
+                    <p class="contact-intro">Have a project in mind or just want to chat? Feel free to reach out!</p>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                    <p id="formMsg" class="form-message"></p>
+                </div>
+            </div>
+        </section>
+    </main>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; <span id="year"></span> Roshni Stephen. All rights reserved.</p>
+        </div>
+    </footer>
 
-<!-- About -->
-<section id="about" class="container section about-page">
-<h2>About Me</h2>
-<div class="about-grid">
-<img src="assets/avatar.jpg" class="about-photo" />
-<p>Hello! I am a front-end developer who loves building clean UI and simple user experiences.</p>
-</div>
-</section>
-
-
-<!-- Contact -->
-<section id="contact" class="container section contact-page">
-<h2>Contact</h2>
-<form id="contactForm">
-<input type="text" name="name" placeholder="Your Name" required>
-<input type="email" name="email" placeholder="Your Email" required>
-<textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-<button class="btn">Send</button>
-</form>
-<p id="formMsg"></p>
-</section>
-</main>
-
-
-<footer class="site-footer">
-<p>© <span id="year"></span> Your Name</p>
-</footer>
-
-
-<script src="js/main.js"></script>
-<script src="js/contact.js"></script>
+    <script src="main.js"></script>
+    <script src="contact.js"></script>
 </body>
 </html>
