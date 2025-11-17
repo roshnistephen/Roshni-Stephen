@@ -196,10 +196,14 @@ body {
 }
 
 .hero-subtitle {
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
     color: var(--text-secondary);
-    margin-bottom: 1rem;
-    font-weight: 500;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    line-height: 1.8;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .hero-description {
@@ -287,24 +291,35 @@ body {
 }
 
 .section-title {
-    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
     position: relative;
     display: inline-block;
     left: 50%;
     transform: translateX(-50%);
+    padding-bottom: 1rem;
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    border-radius: 2px;
 }
 
 .section-title::after {
     content: '';
     position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
+    bottom: 0;
+    left: 60px;
+    width: 10px;
+    height: 3px;
     background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     border-radius: 2px;
 }
@@ -410,6 +425,9 @@ body {
     border: 1px solid var(--border-color);
     transition: all var(--transition-speed) ease;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }
 
 .project-card:hover {
@@ -556,6 +574,44 @@ body {
     text-align: center;
     color: var(--text-muted);
     margin: 0;
+}
+
+/* ===============================================
+   SCROLL TO TOP BUTTON
+   =============================================== */
+.scroll-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    transition: all var(--transition-speed) ease;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 999;
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+}
+
+.scroll-to-top:active {
+    transform: translateY(-3px);
 }
 
 /* ===============================================
