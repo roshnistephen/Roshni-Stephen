@@ -1,118 +1,124 @@
 // ===============================================
-// PARTICLE BACKGROUND ANIMATION
+// GEOMETRICAL PATTERN BACKGROUND ANIMATION
 // ===============================================
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
-let particles = [];
-let particleCount;
-let mouse = { x: null, y: null, radius: 150 };
+let shapes = [];
+let shapeCount;
 
 // Resize canvas
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    // Adjust particle count based on screen size
-    particleCount = Math.floor((canvas.width * canvas.height) / 15000);
-    initParticles();
+    // Adjust shape count based on screen size
+    shapeCount = Math.floor((canvas.width * canvas.height) / 20000);
+    initShapes();
 }
 
-// Particle class
-class Particle {
+// Shape class for geometrical patterns
+class GeometricShape {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.radius = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.3;
+        this.size = Math.random() * 30 + 20;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.01;
+        this.opacity = Math.random() * 0.3 + 0.1;
+        this.type = Math.floor(Math.random() * 3); // 0: hexagon, 1: square, 2: triangle
     }
 
     update() {
         this.x += this.vx;
         this.y += this.vy;
+        this.rotation += this.rotationSpeed;
 
         // Bounce off edges
-        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
-        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
-
-        // Mouse interaction
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < mouse.radius && mouse.x !== null) {
-            const force = (mouse.radius - distance) / mouse.radius;
-            const angle = Math.atan2(dy, dx);
-            this.vx -= Math.cos(angle) * force * 0.2;
-            this.vy -= Math.sin(angle) * force * 0.2;
-        }
-
-        // Damping
-        this.vx *= 0.99;
-        this.vy *= 0.99;
+        if (this.x < -this.size || this.x > canvas.width + this.size) this.vx = -this.vx;
+        if (this.y < -this.size || this.y > canvas.height + this.size) this.vy = -this.vy;
     }
 
     draw() {
-        ctx.fillStyle = `rgba(124, 58, 237, ${this.opacity})`;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.strokeStyle = `rgba(124, 58, 237, ${this.opacity})`;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
 
-// Initialize particles
-function initParticles() {
-    particles = [];
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
-}
-
-// Connect nearby particles
-function connectParticles() {
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 120) {
-                const opacity = (1 - distance / 120) * 0.3;
-                ctx.strokeStyle = `rgba(124, 58, 237, ${opacity})`;
-                ctx.lineWidth = 0.5;
-                ctx.beginPath();
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
+        if (this.type === 0) {
+            // Hexagon
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i;
+                const x = this.size * Math.cos(angle);
+                const y = this.size * Math.sin(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             }
+            ctx.closePath();
+        } else if (this.type === 1) {
+            // Square
+            ctx.rect(-this.size / 2, -this.size / 2, this.size, this.size);
+        } else {
+            // Triangle
+            ctx.moveTo(0, -this.size / 2);
+            ctx.lineTo(this.size / 2, this.size / 2);
+            ctx.lineTo(-this.size / 2, this.size / 2);
+            ctx.closePath();
         }
+
+        ctx.stroke();
+        ctx.restore();
+    }
+}
+
+// Initialize shapes
+function initShapes() {
+    shapes = [];
+    for (let i = 0; i < shapeCount; i++) {
+        shapes.push(new GeometricShape());
+    }
+}
+
+// Draw grid pattern
+function drawGrid() {
+    const gridSize = 50;
+    ctx.strokeStyle = 'rgba(124, 58, 237, 0.05)';
+    ctx.lineWidth = 1;
+
+    // Vertical lines
+    for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+
+    // Horizontal lines
+    for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
     }
 }
 
 // Animation loop
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw subtle grid
+    drawGrid();
 
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
+    // Update and draw shapes
+    shapes.forEach(shape => {
+        shape.update();
+        shape.draw();
     });
 
-    connectParticles();
     requestAnimationFrame(animate);
 }
-
-// Mouse move event
-window.addEventListener('mousemove', (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
-});
-
-// Mouse leave event
-window.addEventListener('mouseleave', () => {
-    mouse.x = null;
-    mouse.y = null;
-});
 
 // Resize event
 window.addEventListener('resize', resizeCanvas);
@@ -206,6 +212,30 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+// ===============================================
+// SCROLL TO TOP BUTTON
+// ===============================================
+const scrollToTopBtn = document.getElementById('scrollToTop');
+
+if (scrollToTopBtn) {
+    // Show/hide button on scroll
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollToTopBtn.classList.add('visible');
+        } else {
+            scrollToTopBtn.classList.remove('visible');
+        }
+    });
+
+    // Scroll to top on click
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
 // ===============================================
 // INTERSECTION OBSERVER FOR ANIMATIONS
