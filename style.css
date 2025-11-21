@@ -472,7 +472,6 @@ body {
     opacity: 0.5;
     transition: all var(--transition-speed) ease;
     position: relative;
-    z-index: 1;
     display: none;
 }
 
