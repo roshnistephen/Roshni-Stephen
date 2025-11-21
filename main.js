@@ -285,3 +285,33 @@ window.addEventListener('scroll', () => {
     
     lastScroll = currentScroll;
 });
+
+// ===============================================
+// PROJECT IMAGE ERROR HANDLING
+// ===============================================
+document.addEventListener('DOMContentLoaded', () => {
+    const projectImages = document.querySelectorAll('.project-thumbnail');
+    
+    projectImages.forEach(img => {
+        img.addEventListener('error', function() {
+            // Hide the image on error using CSS class
+            this.classList.add('hidden');
+            // Show the placeholder emoji using CSS class
+            const placeholder = this.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('project-placeholder')) {
+                placeholder.classList.add('visible');
+            }
+        });
+        
+        // If image loads successfully, ensure placeholder is hidden
+        img.addEventListener('load', function() {
+            // Remove hidden class from image if it was set
+            this.classList.remove('hidden');
+            // Hide the placeholder
+            const placeholder = this.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('project-placeholder')) {
+                placeholder.classList.remove('visible');
+            }
+        });
+    });
+});
