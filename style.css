@@ -36,6 +36,10 @@
     --error-color: #ef4444;
     --warning-color: #f59e0b;
     
+    /* Layout */
+    --header-height: 70px;
+    --scroll-offset: 90px;
+    
     /* Transition & Effects */
     --transition-speed: 0.3s;
     --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -66,7 +70,7 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
-    scroll-padding-top: 80px;
+    scroll-padding-top: var(--scroll-offset);
 }
 
 body {

@@ -8,6 +8,10 @@ let shapes = [];
 let shapeCount;
 let animationId;
 
+// Configuration constants
+const SHAPE_DENSITY = 25000; // Higher = fewer shapes (pixels per shape)
+const MAX_SHAPES = 50; // Maximum number of shapes for performance
+
 // Color palette for geometric shapes
 const colors = {
     primary: 'rgba(0, 188, 212, ',
@@ -24,7 +28,7 @@ function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         // Adjust shape count based on screen size - optimized for performance
-        shapeCount = Math.min(Math.floor((canvas.width * canvas.height) / 25000), 50);
+        shapeCount = Math.min(Math.floor((canvas.width * canvas.height) / SHAPE_DENSITY), MAX_SHAPES);
         initShapes();
     }, 100);
 }
