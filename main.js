@@ -1,32 +1,51 @@
 // ===============================================
 // GEOMETRICAL PATTERN BACKGROUND ANIMATION
+// Professional Cyan Color Theme
 // ===============================================
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 let shapes = [];
 let shapeCount;
+let animationId;
 
-// Resize canvas
+// Color palette for geometric shapes
+const colors = {
+    primary: 'rgba(0, 188, 212, ',
+    accent: 'rgba(0, 229, 255, ',
+    light: 'rgba(77, 208, 225, ',
+    grid: 'rgba(0, 188, 212, 0.04)'
+};
+
+// Resize canvas with debouncing
+let resizeTimeout;
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    // Adjust shape count based on screen size
-    shapeCount = Math.floor((canvas.width * canvas.height) / 20000);
-    initShapes();
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        // Adjust shape count based on screen size - optimized for performance
+        shapeCount = Math.min(Math.floor((canvas.width * canvas.height) / 25000), 50);
+        initShapes();
+    }, 100);
 }
 
 // Shape class for geometrical patterns
 class GeometricShape {
     constructor() {
+        this.reset();
+    }
+    
+    reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 30 + 20;
-        this.vx = (Math.random() - 0.5) * 0.3;
-        this.vy = (Math.random() - 0.5) * 0.3;
+        this.size = Math.random() * 35 + 15;
+        this.vx = (Math.random() - 0.5) * 0.25;
+        this.vy = (Math.random() - 0.5) * 0.25;
         this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.01;
-        this.opacity = Math.random() * 0.3 + 0.1;
-        this.type = Math.floor(Math.random() * 3); // 0: hexagon, 1: square, 2: triangle
+        this.rotationSpeed = (Math.random() - 0.5) * 0.008;
+        this.opacity = Math.random() * 0.25 + 0.08;
+        this.type = Math.floor(Math.random() * 4); // 0: hexagon, 1: square, 2: triangle, 3: circle
+        this.colorType = Math.floor(Math.random() * 3);
     }
 
     update() {
@@ -34,17 +53,24 @@ class GeometricShape {
         this.y += this.vy;
         this.rotation += this.rotationSpeed;
 
-        // Bounce off edges
-        if (this.x < -this.size || this.x > canvas.width + this.size) this.vx = -this.vx;
-        if (this.y < -this.size || this.y > canvas.height + this.size) this.vy = -this.vy;
+        // Wrap around edges for seamless movement
+        if (this.x < -this.size * 2) this.x = canvas.width + this.size;
+        if (this.x > canvas.width + this.size * 2) this.x = -this.size;
+        if (this.y < -this.size * 2) this.y = canvas.height + this.size;
+        if (this.y > canvas.height + this.size * 2) this.y = -this.size;
+    }
+
+    getColor() {
+        const colorKeys = ['primary', 'accent', 'light'];
+        return colors[colorKeys[this.colorType]] + this.opacity + ')';
     }
 
     draw() {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
-        ctx.strokeStyle = `rgba(124, 58, 237, ${this.opacity})`;
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = this.getColor();
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
 
         if (this.type === 0) {
@@ -59,13 +85,18 @@ class GeometricShape {
             ctx.closePath();
         } else if (this.type === 1) {
             // Square
-            ctx.rect(-this.size / 2, -this.size / 2, this.size, this.size);
-        } else {
+            const half = this.size / 2;
+            ctx.rect(-half, -half, this.size, this.size);
+        } else if (this.type === 2) {
             // Triangle
-            ctx.moveTo(0, -this.size / 2);
-            ctx.lineTo(this.size / 2, this.size / 2);
-            ctx.lineTo(-this.size / 2, this.size / 2);
+            const half = this.size / 2;
+            ctx.moveTo(0, -half);
+            ctx.lineTo(half, half);
+            ctx.lineTo(-half, half);
             ctx.closePath();
+        } else {
+            // Circle
+            ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
         }
 
         ctx.stroke();
@@ -83,8 +114,8 @@ function initShapes() {
 
 // Draw grid pattern
 function drawGrid() {
-    const gridSize = 50;
-    ctx.strokeStyle = 'rgba(124, 58, 237, 0.05)';
+    const gridSize = 60;
+    ctx.strokeStyle = colors.grid;
     ctx.lineWidth = 1;
 
     // Vertical lines
@@ -104,7 +135,7 @@ function drawGrid() {
     }
 }
 
-// Animation loop
+// Animation loop with performance optimization
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -112,16 +143,25 @@ function animate() {
     drawGrid();
 
     // Update and draw shapes
-    shapes.forEach(shape => {
-        shape.update();
-        shape.draw();
-    });
+    for (let i = 0; i < shapes.length; i++) {
+        shapes[i].update();
+        shapes[i].draw();
+    }
 
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
 }
 
-// Resize event
-window.addEventListener('resize', resizeCanvas);
+// Handle visibility change to pause animation when tab is hidden
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        cancelAnimationFrame(animationId);
+    } else {
+        animate();
+    }
+});
+
+// Resize event with passive listener
+window.addEventListener('resize', resizeCanvas, { passive: true });
 
 // Initialize
 resizeCanvas();
@@ -136,13 +176,14 @@ const mainNav = document.getElementById('main-nav');
 if (navToggle && mainNav) {
     navToggle.addEventListener('click', () => {
         mainNav.classList.toggle('open');
+        document.body.style.overflow = mainNav.classList.contains('open') ? 'hidden' : '';
         
         // Animate hamburger menu
         const spans = navToggle.querySelectorAll('span');
         if (mainNav.classList.contains('open')) {
-            spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+            spans[0].style.transform = 'rotate(45deg) translate(6px, 6px)';
             spans[1].style.opacity = '0';
-            spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+            spans[2].style.transform = 'rotate(-45deg) translate(6px, -6px)';
         } else {
             spans[0].style.transform = 'none';
             spans[1].style.opacity = '1';
@@ -155,11 +196,24 @@ if (navToggle && mainNav) {
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             mainNav.classList.remove('open');
+            document.body.style.overflow = '';
             const spans = navToggle.querySelectorAll('span');
             spans[0].style.transform = 'none';
             spans[1].style.opacity = '1';
             spans[2].style.transform = 'none';
         });
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mainNav.classList.contains('open')) {
+            mainNav.classList.remove('open');
+            document.body.style.overflow = '';
+            const spans = navToggle.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        }
     });
 }
 
@@ -167,49 +221,70 @@ if (navToggle && mainNav) {
 // ACTIVE MENU HIGHLIGHTING ON SCROLL
 // ===============================================
 const sections = document.querySelectorAll('section');
-const navLinks = document.querySelectorAll('.nav-link');
+const allNavLinks = document.querySelectorAll('.nav-link');
 
-window.addEventListener('scroll', () => {
+// Throttle function for performance
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
+
+const handleScroll = throttle(() => {
     let current = '';
+    const scrollPos = window.scrollY + 120;
     
     sections.forEach(section => {
-        const sectionTop = section.offsetTop - 100;
+        const sectionTop = section.offsetTop;
         const sectionHeight = section.clientHeight;
         
-        if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
             current = section.getAttribute('id');
         }
     });
 
-    navLinks.forEach(link => {
+    allNavLinks.forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('href') === `#${current}`) {
             link.classList.add('active');
         }
     });
-});
+}, 100);
+
+window.addEventListener('scroll', handleScroll, { passive: true });
 
 // ===============================================
 // SMOOTH SCROLL FOR NAVIGATION LINKS
+// Enhanced with easing for professional feel
 // ===============================================
+function smoothScrollTo(targetId) {
+    const targetSection = document.querySelector(targetId);
+    if (!targetSection) return;
+    
+    const headerOffset = 90;
+    const elementPosition = targetSection.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+    });
+}
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
         const targetId = this.getAttribute('href');
         
         if (targetId === '#') return;
-        
-        const targetSection = document.querySelector(targetId);
-        if (targetSection) {
-            const headerOffset = 80;
-            const elementPosition = targetSection.offsetTop;
-            const offsetPosition = elementPosition - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }
+        smoothScrollTo(targetId);
     });
 });
 
@@ -219,14 +294,16 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 const scrollToTopBtn = document.getElementById('scrollToTop');
 
 if (scrollToTopBtn) {
-    // Show/hide button on scroll
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
+    // Show/hide button on scroll with throttle
+    const handleScrollToTop = throttle(() => {
+        if (window.scrollY > 400) {
             scrollToTopBtn.classList.add('visible');
         } else {
             scrollToTopBtn.classList.remove('visible');
         }
-    });
+    }, 100);
+    
+    window.addEventListener('scroll', handleScrollToTop, { passive: true });
 
     // Scroll to top on click
     scrollToTopBtn.addEventListener('click', () => {
@@ -239,25 +316,41 @@ if (scrollToTopBtn) {
 
 // ===============================================
 // INTERSECTION OBSERVER FOR ANIMATIONS
+// Professional staggered animations
 // ===============================================
 const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -100px 0px'
+    threshold: 0.15,
+    rootMargin: '0px 0px -80px 0px'
 };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+const fadeInObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
         if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
-            observer.unobserve(entry.target);
+            // Add staggered delay for cards
+            const delay = entry.target.dataset.delay || 0;
+            entry.target.style.animationDelay = `${delay * 0.1}s`;
+            entry.target.style.animation = 'fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+            fadeInObserver.unobserve(entry.target);
         }
     });
 }, observerOptions);
 
-// Observe elements
-document.querySelectorAll('.skill-card, .project-card, .about-content, .contact-content').forEach(el => {
+// Observe elements with staggered delays
+document.querySelectorAll('.skill-card').forEach((el, index) => {
     el.style.opacity = '0';
-    observer.observe(el);
+    el.dataset.delay = index;
+    fadeInObserver.observe(el);
+});
+
+document.querySelectorAll('.project-card').forEach((el, index) => {
+    el.style.opacity = '0';
+    el.dataset.delay = index;
+    fadeInObserver.observe(el);
+});
+
+document.querySelectorAll('.about-content, .contact-content').forEach(el => {
+    el.style.opacity = '0';
+    fadeInObserver.observe(el);
 });
 
 // ===============================================
@@ -271,20 +364,19 @@ if (yearElement) {
 // ===============================================
 // HEADER SCROLL EFFECT
 // ===============================================
-let lastScroll = 0;
 const header = document.querySelector('.site-header');
 
-window.addEventListener('scroll', () => {
+const handleHeaderScroll = throttle(() => {
     const currentScroll = window.pageYOffset;
     
-    if (currentScroll > 100) {
-        header.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.3)';
+    if (currentScroll > 50) {
+        header.classList.add('scrolled');
     } else {
-        header.style.boxShadow = 'none';
+        header.classList.remove('scrolled');
     }
-    
-    lastScroll = currentScroll;
-});
+}, 100);
+
+window.addEventListener('scroll', handleHeaderScroll, { passive: true });
 
 // ===============================================
 // PROJECT IMAGE ERROR HANDLING
