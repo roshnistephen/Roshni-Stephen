@@ -2,44 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional Portfolio - Front-end Developer & UI Builder">
-    <title>Roshni Stephen - Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Roshni Stephen - Professional Front-end Developer & UI Engineer specializing in creating pixel-perfect, responsive web interfaces with modern technologies.">
+    <meta name="keywords" content="Roshni Stephen, Front-end Developer, UI Engineer, Web Developer, HTML5, CSS3, JavaScript, Flutter, Portfolio">
+    <meta name="author" content="Roshni Stephen">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#00bcd4">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Roshni Stephen - Professional Front-end Developer & UI Engineer">
+    <meta property="og:description" content="Creating pixel-perfect, responsive web interfaces with modern technologies and high attention to detail.">
+    <meta property="og:site_name" content="Roshni Stephen Portfolio">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Roshni Stephen - Front-end Developer">
+    <meta name="twitter:description" content="Professional portfolio showcasing front-end development and UI engineering projects.">
+    
+    <title>Roshni Stephen | Front-end Developer & UI Engineer</title>
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts - Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Canonical URL -->
+    <!-- <link rel="canonical" href="https://your-domain.com"> -->
 </head>
 <body>
     <!-- Particle Background Canvas -->
-    <canvas id="particleCanvas"></canvas>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
     <!-- Header Navigation -->
-    <header class="site-header">
-        <nav class="container">
+    <header class="site-header" role="banner">
+        <nav class="container" role="navigation" aria-label="Main navigation">
             <div class="nav-wrapper">
-                <div class="logo">Roshni Stephen</div>
-                <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation">
+                <a href="#home" class="logo" aria-label="Roshni Stephen - Home">Roshni Stephen</a>
+                <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-nav">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
-                <ul id="main-nav" class="nav">
-                    <li><a href="#home" class="nav-link active">Home</a></li>
-                    <li><a href="#about" class="nav-link">About</a></li>
-                    <li><a href="#skills" class="nav-link">Skills</a></li>
-                    <li><a href="#projects" class="nav-link">Projects</a></li>
-                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                <ul id="main-nav" class="nav" role="menubar">
+                    <li role="none"><a href="#home" class="nav-link active" role="menuitem">Home</a></li>
+                    <li role="none"><a href="#about" class="nav-link" role="menuitem">About</a></li>
+                    <li role="none"><a href="#skills" class="nav-link" role="menuitem">Skills</a></li>
+                    <li role="none"><a href="#projects" class="nav-link" role="menuitem">Projects</a></li>
+                    <li role="none"><a href="#contact" class="nav-link" role="menuitem">Contact</a></li>
                 </ul>
             </div>
         </nav>
     </header>
 
-    <main>
+    <main role="main">
         <!-- Hero Section -->
-        <section id="home" class="hero">
+        <section id="home" class="hero" aria-labelledby="hero-title">
             <div class="container">
                 <div class="hero-inner">
                     <div class="hero-text">
-                        <h1 class="hero-title">I Am <span class="accent">Roshni.</span></h1>
-                        <p class="hero-subtitle">A front-end engineer. who always creates pixel-perfect interfaces with a high attention to detail.</p>
+                        <h1 id="hero-title" class="hero-title">I Am <span class="accent">Roshni.</span></h1>
+                        <p class="hero-subtitle">A front-end engineer who always creates pixel-perfect interfaces with a high attention to detail.</p>
                         <div class="hero-buttons">
                             <a class="btn btn-primary" href="#projects">View Projects</a>
                             <a class="btn btn-secondary" href="#contact">Get In Touch</a>
@@ -51,109 +78,109 @@
 
 
         <!-- About Section -->
-        <section id="about" class="section">
+        <section id="about" class="section" aria-labelledby="about-title">
             <div class="container">
                 <div class="section-title-wrapper">
-                    <h2 class="section-title">About Me</h2>
+                    <h2 id="about-title" class="section-title">About Me</h2>
                 </div>
-                <div class="about-content">
+                <article class="about-content">
                     <div class="about-text">
                         <p class="about-intro">Hello! I'm a passionate front-end developer who loves building clean, intuitive user interfaces and creating exceptional user experiences.</p>
                         <p>With expertise in modern web technologies, I focus on creating responsive, accessible, and performant web applications. I believe in writing clean, maintainable code and staying up-to-date with the latest industry trends.</p>
                         <p>When I'm not coding, you can find me exploring new technologies, contributing to open-source projects, or sharing knowledge with the developer community.</p>
                     </div>
-                </div>
+                </article>
             </div>
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="section">
+        <section id="skills" class="section section-dark" aria-labelledby="skills-title">
             <div class="container">
                 <div class="section-title-wrapper">
-                    <h2 class="section-title">Skills & Technologies</h2>
+                    <h2 id="skills-title" class="section-title">Skills & Technologies</h2>
                 </div>
-                <div class="skills-grid">
-                    <div class="skill-card">
-                        <div class="skill-icon">🌐</div>
+                <div class="skills-grid" role="list">
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">🌐</div>
                         <h3>HTML5</h3>
                         <p>Semantic markup and accessibility-focused development</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">🎨</div>
+                    </article>
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">🎨</div>
                         <h3>CSS3</h3>
                         <p>Modern layouts, animations, and responsive design</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">⚡</div>
+                    </article>
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">⚡</div>
                         <h3>JavaScript</h3>
                         <p>ES6+, DOM manipulation, and asynchronous programming</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">📱</div>
+                    </article>
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">📱</div>
                         <h3>Flutter</h3>
                         <p>Cross-platform mobile app development</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">🔧</div>
+                    </article>
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">🔧</div>
                         <h3>Git & GitHub</h3>
                         <p>Version control and collaborative development</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">🚀</div>
+                    </article>
+                    <article class="skill-card" role="listitem">
+                        <div class="skill-icon" aria-hidden="true">🚀</div>
                         <h3>Web Performance</h3>
                         <p>Optimization and best practices</p>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
 
 
         <!-- Projects Section -->
-        <section id="projects" class="section section-dark">
+        <section id="projects" class="section" aria-labelledby="projects-title">
             <div class="container">
                 <div class="section-title-wrapper">
-                    <h2 class="section-title">My Projects</h2>
+                    <h2 id="projects-title" class="section-title">My Projects</h2>
                 </div>
-                <div class="projects-grid">
-                    <a href="https://soojinoolum.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card">
+                <div class="projects-grid" role="list">
+                    <a href="https://soojinoolum.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" role="listitem" aria-label="View Sooji Noolum project">
                         <div class="project-image">
-                            <img src="img/projects/sooji-noolum.jpg" alt="Sooji Noolum Website" class="project-thumbnail">
-                            <div class="project-placeholder">🍜</div>
+                            <img src="img/projects/sooji-noolum.jpg" alt="Sooji Noolum Website Preview" class="project-thumbnail" loading="lazy">
+                            <div class="project-placeholder" aria-hidden="true">🍜</div>
                         </div>
                         <div class="project-content">
                             <h3>Sooji Noolum</h3>
                             <p>A modern web application showcasing traditional recipes and culinary experiences</p>
-                            <div class="project-tags">
+                            <div class="project-tags" aria-label="Technologies used">
                                 <span class="tag">Web Design</span>
                                 <span class="tag">UI/UX</span>
                                 <span class="tag">Responsive</span>
                             </div>
                         </div>
                     </a>
-                    <a href="https://evolve-events.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card">
+                    <a href="https://evolve-events.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" role="listitem" aria-label="View Evolve Events project">
                         <div class="project-image">
-                            <img src="img/projects/evolve-events.jpg" alt="Evolve Events Website" class="project-thumbnail">
-                            <div class="project-placeholder">🎉</div>
+                            <img src="img/projects/evolve-events.jpg" alt="Evolve Events Website Preview" class="project-thumbnail" loading="lazy">
+                            <div class="project-placeholder" aria-hidden="true">🎉</div>
                         </div>
                         <div class="project-content">
                             <h3>Evolve Events</h3>
                             <p>Event management platform with seamless booking and interactive features</p>
-                            <div class="project-tags">
+                            <div class="project-tags" aria-label="Technologies used">
                                 <span class="tag">Events</span>
                                 <span class="tag">Platform</span>
                                 <span class="tag">Management</span>
                             </div>
                         </div>
                     </a>
-                    <a href="https://lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card">
+                    <a href="https://lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" role="listitem" aria-label="View Loka AI project">
                         <div class="project-image">
-                            <img src="img/projects/loka-ai.jpg" alt="Loka AI Website" class="project-thumbnail">
-                            <div class="project-placeholder">🤖</div>
+                            <img src="img/projects/loka-ai.jpg" alt="Loka AI Website Preview" class="project-thumbnail" loading="lazy">
+                            <div class="project-placeholder" aria-hidden="true">🤖</div>
                         </div>
                         <div class="project-content">
                             <h3>Loka AI</h3>
                             <p>AI-powered platform delivering innovative solutions and intelligent automation</p>
-                            <div class="project-tags">
+                            <div class="project-tags" aria-label="Technologies used">
                                 <span class="tag">AI/ML</span>
                                 <span class="tag">Platform</span>
                                 <span class="tag">Innovation</span>
@@ -166,46 +193,49 @@
 
 
         <!-- Contact Section -->
-        <section id="contact" class="section">
+        <section id="contact" class="section section-dark" aria-labelledby="contact-title">
             <div class="container">
                 <div class="section-title-wrapper">
-                    <h2 class="section-title">Get In Touch</h2>
+                    <h2 id="contact-title" class="section-title">Get In Touch</h2>
                 </div>
                 <div class="contact-content">
                     <p class="contact-intro">Have a project in mind or just want to chat? Feel free to reach out!</p>
-                    <form id="contactForm" class="contact-form">
+                    <form id="contactForm" class="contact-form" aria-label="Contact form">
                         <div class="form-group">
-                            <input type="text" name="name" placeholder="Your Name" required>
+                            <label for="name" class="visually-hidden">Your Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your Name" required autocomplete="name">
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Your Email" required>
+                            <label for="email" class="visually-hidden">Your Email</label>
+                            <input type="email" id="email" name="email" placeholder="Your Email" required autocomplete="email">
                         </div>
                         <div class="form-group">
-                            <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                            <label for="message" class="visually-hidden">Your Message</label>
+                            <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
-                    <p id="formMsg" class="form-message"></p>
+                    <p id="formMsg" class="form-message" aria-live="polite"></p>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="container">
             <p>&copy; <span id="year"></span> Roshni Stephen. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- Scroll to Top Button -->
-    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Scroll to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="18 15 12 9 6 15"></polyline>
         </svg>
     </button>
 
-    <script src="main.js"></script>
-    <script src="contact.js"></script>
+    <script src="main.js" defer></script>
+    <script src="contact.js" defer></script>
 </body>
 </html>
