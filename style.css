@@ -184,23 +184,13 @@ body {
         justify-content: center;
         align-items: center;
         z-index: 1001;
-        list-style: none;
-        list-style-type: none;
     }
 
-    .nav,
-    .nav li,
-    .nav > li {
-        list-style: none !important;
-        list-style-type: none !important;
+    #main-nav,
+    #main-nav li {
+        list-style: none;
         margin: 0;
         padding: 0;
-    }
-
-    .nav li::before,
-    .nav li::marker {
-        content: none !important;
-        display: none !important;
     }
 
     .nav.open {

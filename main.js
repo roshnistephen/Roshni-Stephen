@@ -8,6 +8,7 @@ let particles = [];
 let connections = [];
 let animationId;
 let resizeTimeout;
+let backgroundGradient = null;
 
 const CONFIG = {
     particleCount: 80,
@@ -19,10 +20,17 @@ const CONFIG = {
         particles: ['#00bcd4', '#00e5ff', '#4dd0e1', '#80deea'],
         connections: 'rgba(0, 188, 212, 0.15)',
         glow: 'rgba(0, 229, 255, 0.3)'
-    }
+    },
+    codeFont: '12px monospace'
 };
 
 let mousePos = { x: -1000, y: -1000 };
+
+function createBackgroundGradient() {
+    backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    backgroundGradient.addColorStop(0, '#ffffff');
+    backgroundGradient.addColorStop(1, '#e0f7fa');
+}
 
 function resizeCanvas() {
     clearTimeout(resizeTimeout);
@@ -31,6 +39,7 @@ function resizeCanvas() {
         canvas.height = window.innerHeight;
         const area = canvas.width * canvas.height;
         CONFIG.particleCount = Math.min(Math.floor(area / 15000), CONFIG.maxParticles);
+        createBackgroundGradient();
         initParticles();
     }, 100);
 }
@@ -119,7 +128,7 @@ class Particle {
                 break;
                 
             case 1: // Code bracket < >
-                ctx.font = `${this.size * 4}px monospace`;
+                ctx.font = CONFIG.codeFont;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('<>', this.x, this.y);
@@ -171,10 +180,7 @@ function drawConnections() {
 
 function drawBackground() {
     // Subtle gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#ffffff');
-    gradient.addColorStop(1, '#e0f7fa');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = backgroundGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Subtle grid
