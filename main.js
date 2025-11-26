@@ -3,7 +3,10 @@
 // ===============================================
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
-let shapes = [], shapeCount, animationId, resizeTimeout;
+let shapes = [];
+let shapeCount;
+let animationId;
+let resizeTimeout;
 const CONFIG = { density: 25000, maxShapes: 50 };
 const colors = ['rgba(0,188,212,', 'rgba(0,229,255,', 'rgba(77,208,225,'];
 
@@ -89,7 +92,18 @@ animate();
 // ===============================================
 const navToggle = document.getElementById('nav-toggle');
 const mainNav = document.getElementById('main-nav');
-const throttle = (fn, limit) => { let t; return function() { if (!t) { fn.apply(this, arguments); t = true; setTimeout(() => t = false, limit); } } };
+
+// Throttle function to limit execution frequency
+const throttle = (fn, limit) => {
+    let isThrottled = false;
+    return function() {
+        if (!isThrottled) {
+            fn.apply(this, arguments);
+            isThrottled = true;
+            setTimeout(() => isThrottled = false, limit);
+        }
+    };
+};
 
 if (navToggle && mainNav) {
     const toggleMenu = (open) => {
