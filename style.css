@@ -1159,3 +1159,10 @@ body {
         font-size: 1.25rem;
     }
 }
+.project-img img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
