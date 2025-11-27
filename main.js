@@ -302,14 +302,36 @@ const handleScroll = throttle(() => {
 }, 100);
 window.addEventListener('scroll', handleScroll, { passive: true });
 
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
+// Smooth scroll for all anchor links
+function smoothScrollTo(targetId) {
+    const targetElement = document.querySelector(targetId);
+    if (!targetElement) return;
+    
+    const headerOffset = 90;
+    const elementPosition = targetElement.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    
+    window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+    });
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
         e.preventDefault();
-        const id = a.getAttribute('href');
-        if (id === '#') return;
-        const el = document.querySelector(id);
-        if (el) window.scrollTo({ top: el.offsetTop - 90, behavior: 'smooth' });
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        // Close mobile menu if open
+        if (mainNav && mainNav.classList.contains('open')) {
+            mainNav.classList.remove('open');
+            navToggle.classList.remove('active');
+            document.body.style.overflow = '';
+            navToggle.setAttribute('aria-expanded', 'false');
+        }
+        
+        smoothScrollTo(targetId);
     });
 });
 
@@ -334,6 +356,7 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.skill-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
 document.querySelectorAll('.project-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
+document.querySelectorAll('.service-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
 document.querySelectorAll('.about-content, .contact-content').forEach(el => { el.style.opacity = '0'; observer.observe(el); });
 
 // Footer year
