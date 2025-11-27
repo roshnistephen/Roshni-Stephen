@@ -1268,15 +1268,15 @@ body {
 }
 
 .social-link.facebook {
-    animation: socialPulse 3s ease-in-out infinite 0.5s;
+    animation: socialPulse 3s ease-in-out infinite 0.4s;
 }
 
 .social-link.linkedin {
-    animation: socialPulse 3s ease-in-out infinite 1s;
+    animation: socialPulse 3s ease-in-out infinite 0.8s;
 }
 
 .social-link.github {
-    animation: socialPulse 3s ease-in-out infinite 1.5s;
+    animation: socialPulse 3s ease-in-out infinite 1.2s;
 }
 
 @keyframes socialPulse {
