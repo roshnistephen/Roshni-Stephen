@@ -314,36 +314,28 @@ body {
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    padding: 5px;
-    background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary-light), var(--primary));
-    background-size: 400% 400%;
-    animation: borderRotate 3s linear infinite, borderGlow 2s ease-in-out infinite alternate;
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 188, 212, 0.3), 0 0 60px rgba(0, 229, 255, 0.2);
+    padding: 2px;
+    background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary-light));
+    background-size: 200% 200%;
+    animation: borderRotate 4s linear infinite;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.15), 0 0 16px rgba(0, 188, 212, 0.1);
 }
 
 .profile-photo-border::before {
     content: '';
     position: absolute;
-    inset: -3px;
+    inset: -1px;
     border-radius: 50%;
-    background: linear-gradient(135deg, transparent, var(--accent), transparent, var(--primary), transparent);
-    background-size: 400% 400%;
-    animation: borderRotate 2s linear infinite reverse;
+    background: linear-gradient(135deg, transparent, rgba(0, 229, 255, 0.2), transparent);
+    background-size: 200% 200%;
+    animation: borderRotate 3s linear infinite reverse;
     z-index: -1;
-    filter: blur(8px);
-    opacity: 0.8;
+    filter: blur(3px);
+    opacity: 0.5;
 }
 
 .profile-photo-border::after {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, transparent, var(--accent), var(--primary-light), transparent, var(--accent), transparent);
-    animation: sparkleRotate 4s linear infinite;
-    z-index: -2;
-    filter: blur(4px);
-    opacity: 0.6;
+    display: none;
 }
 
 @keyframes borderRotate {
@@ -355,15 +347,6 @@ body {
     }
     100% {
         background-position: 0% 50%;
-    }
-}
-
-@keyframes borderGlow {
-    0% {
-        box-shadow: 0 0 20px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 188, 212, 0.3), 0 0 60px rgba(0, 229, 255, 0.2);
-    }
-    100% {
-        box-shadow: 0 0 30px rgba(0, 229, 255, 0.8), 0 0 60px rgba(0, 188, 212, 0.5), 0 0 80px rgba(0, 229, 255, 0.4);
     }
 }
 
@@ -382,7 +365,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     background: var(--bg-primary);
-    border: 3px solid var(--bg-primary);
+    border: 2px solid var(--bg-primary);
 }
 
 /* Scroll Down Arrow */
@@ -437,7 +420,7 @@ body {
     font-weight: 800;
     margin-bottom: 1.5rem;
     line-height: 1.15;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     color: var(--text-primary);
     animation: titleSlideIn 1s ease-out 0.2s both;
 }
@@ -463,23 +446,14 @@ body {
     animation: accentFloat 4s ease-in-out infinite;
 }
 
-/* Professional Black Border with Glowing Effect for Roshni */
+/* Professional Subtle Border with Refined Glow Effect for Roshni */
 .accent.roshni-border-glow {
     position: relative;
     display: inline-block;
-    padding: 0.1em 0.3em;
-    border: 3px solid #000;
-    border-radius: 8px;
-    animation: roshniGlowBorder 2s ease-in-out infinite, accentFloat 4s ease-in-out infinite;
-}
-
-@keyframes roshniGlowBorder {
-    0%, 100% {
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 229, 255, 0.4), 0 0 20px rgba(0, 188, 212, 0.3);
-    }
-    50% {
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 229, 255, 0.7), 0 0 35px rgba(0, 188, 212, 0.5);
-    }
+    padding: 0.05em 0.2em;
+    border: 1.5px solid rgba(0, 188, 212, 0.6);
+    border-radius: 6px;
+    animation: accentFloat 4s ease-in-out infinite;
 }
 
 @keyframes accentFloat {
@@ -910,14 +884,14 @@ body {
     left: 0;
     width: 100%;
     height: 260px;
-    background: linear-gradient(135deg, rgba(0, 188, 212, 0.85) 0%, rgba(0, 229, 255, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(0, 188, 212, 0.4) 0%, rgba(0, 229, 255, 0.35) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 5;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(2px);
 }
 
 .project-card:hover .project-overlay { opacity: 1; }
