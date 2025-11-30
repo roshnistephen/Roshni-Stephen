@@ -1,11 +1,11 @@
 // ===============================================
-// CONTACT FORM HANDLING
+// CONTACT FORM HANDLING - FormSubmit Integration
 // ===============================================
 const contactForm = document.getElementById('contactForm');
 const formMsg = document.getElementById('formMsg');
 
 if (contactForm && formMsg) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         // Get form values
@@ -26,24 +26,46 @@ if (contactForm && formMsg) {
             return;
         }
         
-        // Create mailto link
-        const subject = encodeURIComponent(`Message from ${name}`);
-        const body = encodeURIComponent(`${message}\n\n---\nFrom: ${name}\nEmail: ${email}`);
-        const mailtoLink = `mailto:roshni@example.com?subject=${subject}&body=${body}`;
+        // Show loading state
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
         
-        // Show success message
-        showMessage('Opening your email client...', 'success');
-        
-        // Open mailto link
-        setTimeout(() => {
-            window.location.href = mailtoLink;
+        try {
+            // Send via FormSubmit (free email service)
+            const response = await fetch('https://formsubmit.co/ajax/roshnistephen4@gmail.com', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    message: message,
+                    _subject: `Portfolio Contact: Message from ${name}`
+                })
+            });
             
-            // Clear form after short delay
-            setTimeout(() => {
+            const data = await response.json();
+            
+            if (data.success === 'true' || response.ok) {
+                showMessage('Thank you! Your message has been sent successfully. 🎉', 'success');
                 contactForm.reset();
-                showMessage('Thank you for reaching out! Your message has been prepared.', 'success');
-            }, 1000);
-        }, 500);
+            } else {
+                throw new Error('Failed to send');
+            }
+        } catch (error) {
+            // Fallback to mailto if API fails
+            const subject = encodeURIComponent(`Portfolio Contact: Message from ${name}`);
+            const body = encodeURIComponent(`${message}\n\n---\nFrom: ${name}\nEmail: ${email}`);
+            window.location.href = `mailto:roshnistephen4@gmail.com?subject=${subject}&body=${body}`;
+            showMessage('Opening your email client as backup...', 'success');
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
     });
     
     // Show message function

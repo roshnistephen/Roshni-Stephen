@@ -11,17 +11,17 @@ let resizeTimeout;
 let backgroundGradient = null;
 
 const CONFIG = {
-    particleCount: 80,
-    maxParticles: 120,
-    connectionDistance: 150,
-    particleSpeed: 0.8,
-    mouseInfluence: 100,
+    particleCount: 50,
+    maxParticles: 80,
+    connectionDistance: 120,
+    particleSpeed: 0.6,
+    mouseInfluence: 80,
     colors: {
-        particles: ['#00bcd4', '#00e5ff', '#4dd0e1', '#80deea'],
-        connections: 'rgba(0, 188, 212, 0.15)',
-        glow: 'rgba(0, 229, 255, 0.3)'
+        particles: ['#00bcd4', '#00e5ff', '#4dd0e1'],
+        connections: 'rgba(0, 188, 212, 0.12)',
+        glow: 'rgba(0, 229, 255, 0.2)'
     },
-    codeFont: '12px monospace'
+    codeFont: '11px monospace'
 };
 
 let mousePos = { x: -1000, y: -1000 };

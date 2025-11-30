@@ -3,42 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Roshni Stephen - Expert Front-end Developer & UI/UX Engineer crafting pixel-perfect, accessible, SEO-optimized responsive web applications with React, JavaScript, HTML5, CSS3, and Flutter.">
-    <meta name="keywords" content="Roshni Stephen, Front-end Developer, UI Engineer, UX Designer, Web Developer, React Developer, JavaScript Expert, HTML5, CSS3, Responsive Design, Flutter Developer, Mobile App Development, Portfolio Website, Freelance Developer, Web Design, User Interface, User Experience, Cross-platform Development, Progressive Web Apps, SEO Optimization">
-    <meta name="author" content="Roshni Stephen">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-    <meta name="theme-color" content="#00bcd4">
-    <meta name="googlebot" content="index, follow">
-    <meta name="geo.region" content="IN">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="7 days">
-    <meta name="rating" content="general">
     
-    <!-- Open Graph / Social Media Meta Tags -->
+    <!-- Primary SEO Meta Tags -->
+    <title>Roshni Stephen | Front-end Developer, Mobile App & Game Developer | CEO Loka AI</title>
+    <meta name="description" content="Roshni Stephen - CEO of Loka AI & Co-founder of Cybersyon Softwares. Creative Front-end Developer, Mobile App & Game Developer crafting pixel-perfect web applications with React, JavaScript, Flutter.">
+    <meta name="keywords" content="Roshni Stephen, Loka AI CEO, Cybersyon Softwares Co-founder, Front-end Developer, Mobile App Developer, Game Developer, UI/UX Designer, React Developer, Flutter Developer, JavaScript Expert, HTML5, CSS3, Web Development, Portfolio">
+    <meta name="author" content="Roshni Stephen">
+    
+    <!-- Robots & Crawling -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="bingbot" content="index, follow">
+    
+    <!-- Geographic & Language -->
+    <meta name="geo.region" content="IN">
+    <meta name="geo.placename" content="India">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="3 days">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
+    
+    <!-- Theme & Mobile -->
+    <meta name="theme-color" content="#00bcd4">
+    <meta name="msapplication-TileColor" content="#00bcd4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Roshni Stephen - Expert Front-end Developer & UI/UX Engineer">
-    <meta property="og:description" content="Crafting pixel-perfect, accessible, and high-performance web interfaces with modern technologies. View my portfolio of responsive web applications and mobile apps.">
+    <meta property="og:title" content="Roshni Stephen | Front-end Developer & CEO Loka AI">
+    <meta property="og:description" content="CEO of Loka AI & Co-founder of Cybersyon Softwares. Crafting pixel-perfect web & mobile applications.">
     <meta property="og:site_name" content="Roshni Stephen Portfolio">
     <meta property="og:locale" content="en_US">
     
-    <!-- Twitter Card Meta Tags -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Roshni Stephen - Front-end Developer & UI Engineer">
-    <meta name="twitter:description" content="Professional portfolio showcasing innovative front-end development, UI/UX design, and cross-platform mobile applications.">
+    <meta name="twitter:title" content="Roshni Stephen | Front-end Developer & CEO Loka AI">
+    <meta name="twitter:description" content="CEO of Loka AI & Co-founder of Cybersyon Softwares. Creative developer crafting pixel-perfect experiences.">
     
-    <title>Roshni Stephen | Expert Front-end Developer & UI/UX Engineer | Portfolio</title>
-    
-    <!-- Preconnect for performance -->
+    <!-- Performance: Preconnect & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
-    <!-- Google Fonts - Inter for modern typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Critical CSS Inline + Async Font Loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"></noscript>
     
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- Canonical URL -->
-    <!-- <link rel="canonical" href="https://your-domain.com"> -->
+    <!-- Structured Data / JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Roshni Stephen",
+        "jobTitle": ["CEO", "Front-end Developer", "Mobile App Developer"],
+        "worksFor": [
+            {"@type": "Organization", "name": "Loka AI", "url": "https://lokaai.in/"},
+            {"@type": "Organization", "name": "Cybersyon Softwares", "url": "https://www.cybersyon.com/"}
+        ],
+        "knowsAbout": ["Web Development", "Mobile App Development", "Game Development", "UI/UX Design"],
+        "sameAs": ["https://www.linkedin.com/in/roshni-a-s-545a6215a/", "https://github.com/roshnistephen"]
+    }
+    </script>
 </head>
 <body>
     <!-- Particle Background Canvas -->
@@ -81,11 +110,11 @@
                         <!-- Profile Photo with Glowing Border -->
                         <div class="profile-photo-wrapper">
                             <div class="profile-photo-border">
-                                <img src="images/my-photo.jpg" alt="Roshni Stephen - Front-end Developer" class="profile-photo">
+                                <img src="images/my-photo.jpg" alt="Roshni Stephen - CEO Loka AI" class="profile-photo" width="180" height="180" fetchpriority="high">
                             </div>
                         </div>
-                        <h1 id="hero-title" class="hero-title">I Am <span class="accent roshni-border-glow" data-text="Roshni.">Roshni.</span></h1>
-                        <p class="hero-subtitle">A front-end engineer who always creates pixel-perfect interfaces with a high attention to detail.</p>
+                        <h1 id="hero-title" class="hero-title">I Am <span class="accent roshni-border-glow">Roshni.</span></h1>
+                        <p class="hero-subtitle">Creative Front-end Developer & Mobile App Developer crafting delightful, pixel-perfect experiences ✨</p>
                         <div class="hero-buttons">
                             <a class="btn btn-primary" href="#projects">View Projects</a>
                             <a class="btn btn-secondary" href="#contact">Get In Touch</a>
@@ -111,35 +140,35 @@
                 <div class="skills-grid" role="list">
                     <article class="skill-card" role="listitem">
                         <div class="skill-icon-img" aria-hidden="true">
-                            <img src="images/html.jpg" alt="HTML5" loading="lazy">
+                            <img src="images/html.jpg" alt="HTML5" loading="lazy" decoding="async">
                         </div>
                         <h3>HTML5</h3>
                         <p>Semantic markup and accessibility-focused development</p>
                     </article>
                     <article class="skill-card" role="listitem">
                         <div class="skill-icon-img" aria-hidden="true">
-                            <img src="images/css.jpg" alt="CSS3" loading="lazy">
+                            <img src="images/css.jpg" alt="CSS3" loading="lazy" decoding="async">
                         </div>
                         <h3>CSS3</h3>
                         <p>Modern layouts, animations, and responsive design</p>
                     </article>
                     <article class="skill-card" role="listitem">
                         <div class="skill-icon-img" aria-hidden="true">
-                            <img src="images/jquery.jpg" alt="jQuery" loading="lazy">
+                            <img src="images/jquery.jpg" alt="jQuery" loading="lazy" decoding="async">
                         </div>
                         <h3>jQuery</h3>
                         <p>DOM manipulation and interactive web development</p>
                     </article>
                     <article class="skill-card" role="listitem">
                         <div class="skill-icon-img" aria-hidden="true">
-                            <img src="images/javascript.jpg" alt="JavaScript" loading="lazy">
+                            <img src="images/javascript.jpg" alt="JavaScript" loading="lazy" decoding="async">
                         </div>
                         <h3>JavaScript</h3>
                         <p>ES6+, DOM manipulation, and asynchronous programming</p>
                     </article>
                     <article class="skill-card" role="listitem">
                         <div class="skill-icon-img" aria-hidden="true">
-                            <img src="images/flutter.jpg" alt="Flutter" loading="lazy">
+                            <img src="images/flutter.jpg" alt="Flutter" loading="lazy" decoding="async">
                         </div>
                         <h3>Flutter</h3>
                         <p>Cross-platform mobile app development</p>
@@ -159,13 +188,13 @@
                     <!-- Sooji Noolum -->
                     <a href="https://soojinoolum.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View Sooji Noolum project">
                         <div class="project-image">
-                            <img class="project-thumbnail" src="images/sooji-noolum.png" alt="Sooji Noolum - Traditional Recipe Web Application" loading="lazy">
+                            <img class="project-thumbnail" src="images/sooji-noolum.png" alt="Sooji Noolum - Traditional Recipe Web Application" loading="lazy" decoding="async">
                             <span class="project-placeholder" aria-hidden="true">🍳</span>
                         </div>
                         <div class="project-content">
-                            <span class="project-category">Web Design</span>
+                            <span class="project-category">Custom Apparel</span>
                             <h3>Sooji Noolum</h3>
-                            <p>A modern web application showcasing traditional recipes and culinary experiences with intuitive navigation.</p>
+                            <p>Custom apparel and clothing brand website with elegant design.</p>
                         </div>
                         <div class="project-overlay">
                             <span class="view-project">View Project →</span>
@@ -175,13 +204,13 @@
                     <!-- Evolve Events -->
                     <a href="https://evolve-events.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View Evolve Events project">
                         <div class="project-image">
-                            <img class="project-thumbnail" src="images/evolve-events.png" alt="Evolve Events - Event Management Platform" loading="lazy">
+                            <img class="project-thumbnail" src="images/evolve-events.png" alt="Evolve Events - Event Management Platform" loading="lazy" decoding="async">
                             <span class="project-placeholder" aria-hidden="true">🎉</span>
                         </div>
                         <div class="project-content">
-                            <span class="project-category">Platform</span>
+                            <span class="project-category">Static Website</span>
                             <h3>Evolve Events</h3>
-                            <p>Event management platform with seamless booking, interactive features, and real-time updates.</p>
+                            <p>Static website for an event management company.</p>
                         </div>
                         <div class="project-overlay">
                             <span class="view-project">View Project →</span>
@@ -191,13 +220,61 @@
                     <!-- Loka AI -->
                     <a href="https://lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View Loka AI project">
                         <div class="project-image">
-                            <img class="project-thumbnail" src="images/loka-ai.png" alt="Loka AI - Intelligent Automation Platform" loading="lazy">
+                            <img class="project-thumbnail" src="images/loka-ai.png" alt="Loka AI - Intelligent Automation Platform" loading="lazy" decoding="async">
                             <span class="project-placeholder" aria-hidden="true">🤖</span>
                         </div>
                         <div class="project-content">
                             <span class="project-category">AI Platform</span>
                             <h3>Loka AI</h3>
-                            <p>AI-powered platform delivering innovative solutions and intelligent automation for businesses.</p>
+                            <p>AI-powered platform for intelligent automation solutions.</p>
+                        </div>
+                        <div class="project-overlay">
+                            <span class="view-project">View Project →</span>
+                        </div>
+                    </a>
+
+                    <!-- L-Stories -->
+                    <a href="https://l-stories.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View L-Stories project">
+                        <div class="project-image">
+                            <img class="project-thumbnail" src="images/l-stories.png" alt="L-Stories - Photography Website" loading="lazy" decoding="async">
+                            <span class="project-placeholder" aria-hidden="true">📷</span>
+                        </div>
+                        <div class="project-content">
+                            <span class="project-category">Photography</span>
+                            <h3>L-Stories</h3>
+                            <p>Photography website UI showcasing stunning visual stories.</p>
+                        </div>
+                        <div class="project-overlay">
+                            <span class="view-project">View Project →</span>
+                        </div>
+                    </a>
+
+                    <!-- Creative Space -->
+                    <a href="https://creative-space.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View Creative Space project">
+                        <div class="project-image">
+                            <img class="project-thumbnail" src="images/Creative Space.png" alt="Creative Space - Customised Gift Business" loading="lazy" decoding="async">
+                            <span class="project-placeholder" aria-hidden="true">🎁</span>
+                        </div>
+                        <div class="project-content">
+                            <span class="project-category">Gift Business</span>
+                            <h3>Creative Space</h3>
+                            <p>Customised gift business website with a cute UI theme.</p>
+                        </div>
+                        <div class="project-overlay">
+                            <span class="view-project">View Project →</span>
+                        </div>
+                    </a>
+
+                    <!-- Flower-Homeo Clinic -->
+                    <a href="https://flower-homeo-clinic.lokaai.in/" target="_blank" rel="noopener noreferrer" class="project-card" aria-label="View Flower-Homeo Clinic project">
+                        <div class="project-image">
+                            <img class="project-thumbnail" src="images/Flower-Homeo Clinic.png" alt="Flower-Homeo Clinic - Healthcare Website" loading="lazy" decoding="async">
+                            <span class="project-placeholder" aria-hidden="true">🌸</span>
+                        </div>
+                        <div class="project-content">
+                            <span class="project-category">Healthcare</span>
+                            <h3>Flower-Homeo Clinic</h3>
+                            <p>Homeopathy clinic website with services and appointment booking.</p>
                         </div>
                         <div class="project-overlay">
                             <span class="view-project">View Project →</span>
@@ -217,13 +294,18 @@
                 <article class="about-content">
                     <div class="about-layout">
                         <div class="about-photo">
-                            <img src="images/my-photo.jpg" alt="Roshni Stephen - Front-end Developer" class="about-photo-img">
+                            <img src="images/my-photo.jpg" alt="Roshni Stephen - Front-end Developer" class="about-photo-img" width="100" height="100" loading="lazy" decoding="async">
                         </div>
                         <div class="about-text">
-                            <p class="about-intro">I'm a front-end developer focused on building clean, simple, and user-friendly digital experiences.</p>
-                            <p>I specialize in creating responsive and accessible interfaces using modern web technologies, ensuring every project is fast, intuitive, and visually consistent.</p>
-                            <p>With two years of hands-on experience, I've developed strong skills in both UI development and front-end design. I believe every project is a chance to refine my craft, and I approach each one with attention to detail, pixel-perfect precision, and a commitment to quality.</p>
-                            <p>My work reflects continuous learning, dedication, and a passion for building meaningful products that solve real user needs.</p>
+                            <p class="about-intro">Hey there! 👋 I'm a passionate developer & entrepreneur.</p>
+                            <p><strong>CEO</strong> of <a href="https://lokaai.in/" target="_blank" rel="noopener">Loka AI</a> & <strong>Co-founder</strong> of <a href="https://www.cybersyon.com/" target="_blank" rel="noopener">Cybersyon Softwares</a>. I specialize in <strong>front-end</strong>, <strong>mobile app</strong> & <strong>game development</strong>.</p>
+                            <p>2+ years crafting pixel-perfect, user-friendly experiences with love! 💖</p>
+                            <div class="about-tags">
+                                <span class="about-tag">🎨 UI/UX</span>
+                                <span class="about-tag">📱 Mobile Apps</span>
+                                <span class="about-tag">🎮 Game Dev</span>
+                                <span class="about-tag">💻 Web Dev</span>
+                            </div>
                         </div>
                     </div>
                     <!-- Social Media Icons -->
