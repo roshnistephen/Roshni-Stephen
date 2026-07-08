@@ -1641,3 +1641,83 @@ body {
     .skill-icon { font-size: 2.5rem; }
     .skill-card h3 { font-size: 1.25rem; }
 }
+
+/* ===== PERFORMANCE OPTIMIZATION STYLES ===== */
+/* Reduce repaints and reflows */
+body.loaded { opacity: 1; transition: opacity 0.3s ease-in; }
+
+/* GPU acceleration for smooth animations */
+.project-card, .service-card, .skill-card, button {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* Optimize animations for performance */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Image optimization */
+img {
+    display: block;
+    width: 100%;
+    height: auto;
+    content-visibility: auto;
+}
+
+img[loading="lazy"] {
+    background: var(--bg-secondary);
+}
+
+/* Font optimization */
+@font-face {
+    font-family: 'Poppins';
+    font-display: swap;
+}
+
+/* Optimize scrolling performance */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lazy loading placeholder */
+.image-placeholder {
+    background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Optimize interactive elements */
+button, a { touch-action: manipulation; }
+
+/* Connection-based optimization */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark light;
+    }
+}
+
+/* Optimize for slow networks */
+@media (max-width: 30em) {
+    img { max-width: 100%; }
+    .projects-grid, .services-grid, .skills-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Optimize font loading */
+.js-enabled { font-display: swap; }
