@@ -1,92 +1,117 @@
-// ===============================================
-// CONTACT FORM HANDLING - FormSubmit Integration
-// ===============================================
-const contactForm = document.getElementById('contactForm');
-const formMsg = document.getElementById('formMsg');
+/* ==========================================================================
+   Contact form — inline validation + FormSubmit AJAX, with a mailto fallback.
+   ========================================================================== */
+(() => {
+  'use strict';
 
-if (contactForm && formMsg) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // Get form values
-        const name = e.target.name.value.trim();
-        const email = e.target.email.value.trim();
-        const message = e.target.message.value.trim();
-        
-        // Basic validation
-        if (!name || !email || !message) {
-            showMessage('Please fill in all fields', 'error');
-            return;
-        }
-        
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            showMessage('Please enter a valid email address', 'error');
-            return;
-        }
-        
-        // Show loading state
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        try {
-            // Send via FormSubmit (free email service)
-            const response = await fetch('https://formsubmit.co/ajax/roshnistephen4@gmail.com', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    message: message,
-                    _subject: `Portfolio Contact: Message from ${name}`
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.success === 'true' || response.ok) {
-                showMessage('Thank you! Your message has been sent successfully. 🎉', 'success');
-                contactForm.reset();
-            } else {
-                throw new Error('Failed to send');
-            }
-        } catch (error) {
-            // Fallback to mailto if API fails
-            const subject = encodeURIComponent(`Portfolio Contact: Message from ${name}`);
-            const body = encodeURIComponent(`${message}\n\n---\nFrom: ${name}\nEmail: ${email}`);
-            window.location.href = `mailto:roshnistephen4@gmail.com?subject=${subject}&body=${body}`;
-            showMessage('Opening your email client as backup...', 'success');
-        } finally {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-    });
-    
-    // Show message function
-    function showMessage(text, type) {
-        formMsg.textContent = text;
-        formMsg.className = `form-message ${type}`;
-        formMsg.style.display = 'block';
-        
-        // Hide message after 5 seconds
-        setTimeout(() => {
-            formMsg.style.display = 'none';
-        }, 5000);
+  const form = document.getElementById('contactForm');
+  const formMsg = document.getElementById('formMsg');
+  if (!form || !formMsg) return;
+
+  const ENDPOINT = 'https://formsubmit.co/ajax/roshnistephen4@gmail.com';
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  const fields = {
+    name: {
+      el: form.elements.name,
+      validate: (v) => (v.length >= 2 ? '' : 'Please enter your name.')
+    },
+    email: {
+      el: form.elements.email,
+      validate: (v) => (EMAIL_RE.test(v) ? '' : 'Please enter a valid email address.')
+    },
+    message: {
+      el: form.elements.message,
+      validate: (v) => (v.length >= 10 ? '' : 'Please tell me a little more (10+ characters).')
     }
-    
-    // Clear message on input
-    const formInputs = contactForm.querySelectorAll('input, textarea');
-    formInputs.forEach(input => {
-        input.addEventListener('focus', () => {
-            if (formMsg.style.display === 'block') {
-                formMsg.style.display = 'none';
-            }
-        });
+  };
+
+  let msgTimer = null;
+
+  const showMessage = (text, type) => {
+    clearTimeout(msgTimer);
+    formMsg.textContent = text;
+    formMsg.className = `form__msg is-visible ${type === 'error' ? 'is-err' : 'is-ok'}`;
+    msgTimer = setTimeout(() => { formMsg.className = 'form__msg'; }, 8000);
+  };
+
+  const setFieldError = (key, error) => {
+    const { el } = fields[key];
+    const wrap = el.closest('.field');
+    const note = form.querySelector(`[data-error-for="${key}"]`);
+
+    if (wrap) wrap.classList.toggle('has-error', Boolean(error));
+    el.setAttribute('aria-invalid', error ? 'true' : 'false');
+    if (note) note.textContent = error;
+  };
+
+  const validateField = (key) => {
+    const error = fields[key].validate(fields[key].el.value.trim());
+    setFieldError(key, error);
+    return !error;
+  };
+
+  // Validate on blur, then live-clear the error once the user fixes it.
+  Object.keys(fields).forEach((key) => {
+    const { el } = fields[key];
+    el.addEventListener('blur', () => validateField(key));
+    el.addEventListener('input', () => {
+      if (el.closest('.field')?.classList.contains('has-error')) validateField(key);
     });
-}
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const keys = Object.keys(fields);
+    const valid = keys.map(validateField).every(Boolean);
+
+    if (!valid) {
+      const firstBad = keys.find((k) => fields[k].el.getAttribute('aria-invalid') === 'true');
+      if (firstBad) fields[firstBad].el.focus();
+      showMessage('Please fix the highlighted fields.', 'error');
+      return;
+    }
+
+    const name = fields.name.el.value.trim();
+    const email = fields.email.el.value.trim();
+    const message = fields.message.el.value.trim();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const label = submitBtn?.querySelector('.btn__label');
+    const originalLabel = label?.textContent ?? '';
+
+    submitBtn?.setAttribute('aria-busy', 'true');
+    submitBtn.disabled = true;
+    if (label) label.textContent = 'Sending…';
+
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          _subject: `Portfolio enquiry from ${name}`
+        })
+      });
+
+      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+      showMessage("Thank you! Your message is on its way — I'll reply soon. 🎉", 'success');
+      form.reset();
+      Object.keys(fields).forEach((key) => setFieldError(key, ''));
+    } catch (error) {
+      // Network or service failure: hand the message off to the user's mail client.
+      const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
+      const body = encodeURIComponent(`${message}\n\n---\nFrom: ${name}\nEmail: ${email}`);
+      showMessage("Couldn't reach the mail service — opening your email app instead.", 'error');
+      window.location.href = `mailto:roshnistephen4@gmail.com?subject=${subject}&body=${body}`;
+    } finally {
+      submitBtn?.removeAttribute('aria-busy');
+      submitBtn.disabled = false;
+      if (label) label.textContent = originalLabel;
+    }
+  });
+})();

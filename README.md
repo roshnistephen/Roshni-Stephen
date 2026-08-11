@@ -1,73 +1,76 @@
-# Professional Portfolio Website
+# Roshni Stephen — Portfolio
 
-A modern, responsive portfolio website featuring an animated particle background and professional UI/UX design.
+Personal portfolio for Roshni Stephen — front-end & mobile app developer, CEO of Loka AI,
+co-founder of Cybersyon Softwares.
 
-## Features
+**Live:** https://rs.lokaai.in/
 
-- **Particle Background Animation**: Canvas-based particle system with mouse interaction
-- **Responsive Design**: Mobile-first approach with breakpoints for all devices
-- **Smooth Animations**: Transitions, hover effects, and scroll-based animations
-- **Modern UI**: Clean design with gradient accents and professional typography
-- **Accessible**: Semantic HTML, ARIA labels, and reduced motion support
-- **Contact Form**: Validated form with visual feedback
+A dependency-free static site: hand-written HTML, CSS and vanilla JavaScript. No build step,
+no framework, no runtime packages.
 
-## Technologies Used
+## Structure
 
-- HTML5
-- CSS3 (with CSS Variables, Flexbox, Grid)
-- Vanilla JavaScript
-- Canvas API for particle animation
-
-## Sections
-
-1. **Hero**: Eye-catching introduction with CTA buttons
-2. **About**: Personal bio and background
-3. **Skills**: Showcase of technical skills with descriptions
-4. **Projects**: Featured projects with tags and descriptions
-5. **Contact**: Contact form for reaching out
-
-## Getting Started
-
-Simply open `index.html` in a modern web browser, or serve it with any static web server:
-
-```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js
-npx http-server
-
-# Using PHP
-php -S localhost:8000
+```
+index.html                 Single page — all sections and structured data
+style.css                  Design tokens + components (see the numbered section map at the top)
+main.js                    Nav drawer, scroll state, reveals, project filters, hero canvas
+contact.js                 Contact form validation + FormSubmit submission
+manifest.json              PWA manifest
+robots.txt / sitemap.xml   Crawling + indexing
+assets/img/
+  projects/                Responsive project screenshots (640w + 1280w, WebP + JPEG)
+  profile/                 Portrait (200/400, WebP + JPEG)
+  tech/                    Toolkit icons (96/192, WebP + JPEG)
+  og-image.jpg             1200x630 social share card
+  icon-*.png               PWA + favicon set
+images/                    Original full-size sources — NOT served to visitors
+tools/optimize-image.sh    Generates the responsive set for a new project screenshot
 ```
 
-Then navigate to `http://localhost:8000` in your browser.
+`images/` holds the untouched originals (~27 MB). They are kept only as sources for
+`tools/optimize-image.sh`; the site itself serves the derivatives in `assets/img/`.
 
-## Browser Support
+## Running locally
 
-Works on all modern browsers:
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers
+```bash
+python3 -m http.server 8000
+```
 
-## Performance
+Then open http://localhost:8000. Any static server works — there is nothing to compile.
 
-- Optimized particle count based on screen size
-- RequestAnimationFrame for smooth animations
-- Efficient DOM manipulation
-- Minimal dependencies (no external libraries)
+## Adding a project
 
-## Customization
+1. Drop the full-size screenshot into `images/`.
+2. Generate the responsive set and print the markup:
 
-Edit the following to customize:
+   ```bash
+   ./tools/optimize-image.sh images/my-new-project.png my-new-project
+   ```
 
-- **Colors**: Modify CSS variables in `style.css`
-- **Content**: Update text in `index.html`
-- **Particle Settings**: Adjust particle count and behavior in `main.js`
-- **Email**: Change contact email in `contact.js`
+3. Paste the printed `<picture>` block into a new card in the `#work` grid in `index.html`,
+   copying the surrounding `<article class="card card--work reveal" data-category="…">` wrapper
+   from an existing card. Valid categories: `photography`, `creative`, `business`, `ai`.
+4. Update the counts that are written into the page by hand:
+   - the `<span>` badge on each `.filter` button,
+   - the **Live projects** figure in the hero `.stats`,
+   - `numberOfItems` and `itemListElement` in the JSON-LD `ItemList`,
+   - the project count in the `<meta name="description">` and the `#work` section lead.
 
-## License
+Requires ImageMagick (`brew install imagemagick`).
 
-Feel free to use this template for your own portfolio!
+## Conventions
 
+- **Design tokens** live in `:root` at the top of `style.css`. Change a colour, radius,
+  shadow or type step there rather than in a component.
+- **Reveal animations** are opt-in: add `class="reveal"` and `main.js` fades the element in
+  on scroll. Without JavaScript everything stays visible (the `.js` class on `<html>` gates it).
+- **Images** are always `<picture>` with a WebP `<source>` and a JPEG `<img>` fallback, with
+  explicit `width`/`height` so nothing shifts while loading.
+- **Canonical URL** is `https://rs.lokaai.in/` — it appears in `<link rel="canonical">`,
+  the Open Graph tags, the JSON-LD, `sitemap.xml` and `robots.txt`. Change all of them together.
+
+## Notes
+
+- `.htaccess` is an Apache config and has **no effect on GitHub Pages**. It is kept only in case
+  the site is ever moved to Apache hosting.
+- The contact form posts to FormSubmit and falls back to a `mailto:` link if that request fails.

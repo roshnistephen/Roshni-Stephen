@@ -23,3 +23,6 @@ build/
 tmp/
 temp/
 *.tmp
+
+# Local tooling output
+.playwright-mcp/

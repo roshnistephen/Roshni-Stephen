@@ -1,32 +1,11 @@
-# Robots.txt for roshnistephen.github.io
-# Allow all search engines to crawl the site
+# robots.txt — https://rs.lokaai.in/
 
+# Search engines must be able to fetch CSS, JS and images to render
+# and rank the page correctly. Do not disallow them.
 User-agent: *
 Allow: /
-Disallow: /private/
-Disallow: /*.json$
-Disallow: /*.xml$
-Disallow: /*.js$
-Disallow: /*.css$
 
-# Specific search engines
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-User-agent: Slurp
-Allow: /
-Crawl-delay: 1
-
-User-agent: DuckDuckBot
-Allow: /
-Crawl-delay: 0
-
-# Disallow bad bots
+# SEO crawlers that provide no value here
 User-agent: AhrefsBot
 Disallow: /
 
@@ -36,6 +15,7 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-# Sitemap location
-Sitemap: https://roshnistephen.github.io/sitemap.xml
-Sitemap: https://roshnistephen.github.io/sitemap-mobile.xml
+User-agent: MJ12bot
+Disallow: /
+
+Sitemap: https://rs.lokaai.in/sitemap.xml

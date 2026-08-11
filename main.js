@@ -1,403 +1,368 @@
-// ===============================================
-// PERFORMANCE UTILITIES
-// Throttle, Debounce, and Optimization Functions
-// ===============================================
-const throttle = (func, limit) => {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    }
-};
+/* ==========================================================================
+   Roshni Stephen — Portfolio
+   UI behaviour: navigation, scroll state, reveals, project filters, hero canvas.
+   ========================================================================== */
+(() => {
+  'use strict';
 
-const debounce = (func, delay) => {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), delay);
-    }
-};
+  const $  = (sel, ctx = document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-// ===============================================
-// WEB TECHNOLOGY THEMED PARTICLE BACKGROUND
-// Auto-animated network/code particles
-// ===============================================
-const canvas = document.getElementById('particleCanvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-let connections = [];
-let animationId;
-let resizeTimeout;
-let backgroundGradient = null;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-const CONFIG = {
-    particleCount: 50,
-    maxParticles: 80,
-    connectionDistance: 120,
-    particleSpeed: 0.6,
-    mouseInfluence: 80,
-    colors: {
-        particles: ['#00bcd4', '#00e5ff', '#4dd0e1'],
-        connections: 'rgba(0, 188, 212, 0.12)',
-        glow: 'rgba(0, 229, 255, 0.2)'
-    },
-    codeFont: '11px monospace'
-};
-
-let mousePos = { x: -1000, y: -1000 };
-
-function createBackgroundGradient() {
-    backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    backgroundGradient.addColorStop(0, '#ffffff');
-    backgroundGradient.addColorStop(1, '#e0f7fa');
-}
-
-function resizeCanvas() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const area = canvas.width * canvas.height;
-        CONFIG.particleCount = Math.min(Math.floor(area / 15000), CONFIG.maxParticles);
-        createBackgroundGradient();
-        initParticles();
-    }, 100);
-}
-
-class Particle {
-    constructor() {
-        this.reset();
-    }
-    
-    reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1.5;
-        this.baseSize = this.size;
-        
-        // Random velocity with slight bias
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * CONFIG.particleSpeed + 0.2;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        
-        // Pulsing effect
-        this.pulse = Math.random() * Math.PI * 2;
-        this.pulseSpeed = Math.random() * 0.03 + 0.01;
-        
-        // Color
-        this.color = CONFIG.colors.particles[Math.floor(Math.random() * CONFIG.colors.particles.length)];
-        this.opacity = Math.random() * 0.5 + 0.3;
-        
-        // Type: 0 = circle, 1 = code bracket, 2 = dot, 3 = small ring
-        this.type = Math.floor(Math.random() * 4);
-    }
-    
-    update() {
-        // Auto movement
-        this.x += this.vx;
-        this.y += this.vy;
-        
-        // Pulsing
-        this.pulse += this.pulseSpeed;
-        this.size = this.baseSize + Math.sin(this.pulse) * 0.5;
-        
-        // Boundary wrapping
-        if (this.x < -20) this.x = canvas.width + 20;
-        if (this.x > canvas.width + 20) this.x = -20;
-        if (this.y < -20) this.y = canvas.height + 20;
-        if (this.y > canvas.height + 20) this.y = -20;
-        
-        // Mouse interaction (subtle attraction)
-        const dx = mousePos.x - this.x;
-        const dy = mousePos.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist < CONFIG.mouseInfluence) {
-            const force = (CONFIG.mouseInfluence - dist) / CONFIG.mouseInfluence * 0.02;
-            this.vx += dx * force * 0.01;
-            this.vy += dy * force * 0.01;
-        }
-        
-        // Damping to prevent excessive speed
-        const maxSpeed = 1.5;
-        const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        if (currentSpeed > maxSpeed) {
-            this.vx = (this.vx / currentSpeed) * maxSpeed;
-            this.vy = (this.vy / currentSpeed) * maxSpeed;
-        }
-    }
-    
-    draw() {
-        ctx.save();
-        ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = this.color;
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = 1;
-        
-        switch(this.type) {
-            case 0: // Glowing circle
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                // Glow effect
-                ctx.globalAlpha = this.opacity * 0.3;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
-                ctx.fill();
-                break;
-                
-            case 1: // Code bracket < >
-                ctx.font = CONFIG.codeFont;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('<>', this.x, this.y);
-                break;
-                
-            case 2: // Small dot
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
-                ctx.fill();
-                break;
-                
-            case 3: // Ring
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size * 1.5, 0, Math.PI * 2);
-                ctx.stroke();
-                break;
-        }
-        
-        ctx.restore();
-    }
-}
-
-function initParticles() {
-    particles = Array.from({ length: CONFIG.particleCount }, () => new Particle());
-}
-
-function drawConnections() {
-    ctx.strokeStyle = CONFIG.colors.connections;
-    ctx.lineWidth = 1;
-    
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (dist < CONFIG.connectionDistance) {
-                const opacity = (1 - dist / CONFIG.connectionDistance) * 0.3;
-                ctx.globalAlpha = opacity;
-                ctx.beginPath();
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
-            }
-        }
-    }
-    ctx.globalAlpha = 1;
-}
-
-function drawBackground() {
-    // Subtle gradient background
-    ctx.fillStyle = backgroundGradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Subtle grid
-    ctx.strokeStyle = 'rgba(0, 188, 212, 0.03)';
-    ctx.lineWidth = 1;
-    const gridSize = 80;
-    
-    for (let x = 0; x < canvas.width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-    
-    for (let y = 0; y < canvas.height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBackground();
-    
-    // Update and draw particles
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
-    
-    // Draw connections
-    drawConnections();
-    
-    animationId = requestAnimationFrame(animate);
-}
-
-// Mouse tracking for subtle interaction
-canvas.addEventListener('mousemove', (e) => {
-    mousePos.x = e.clientX;
-    mousePos.y = e.clientY;
-});
-
-canvas.addEventListener('mouseleave', () => {
-    mousePos.x = -1000;
-    mousePos.y = -1000;
-});
-
-// Visibility change handling
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        cancelAnimationFrame(animationId);
-    } else {
-        animate();
-    }
-});
-
-window.addEventListener('resize', resizeCanvas, { passive: true });
-resizeCanvas();
-animate();
-
-// ===============================================
-// MENU & NAVIGATION (Desktop Fullscreen + Mobile)
-// ===============================================
-const navToggle = document.getElementById('nav-toggle');
-const mainNav = document.getElementById('main-nav');
-
-// Throttle function to limit execution frequency
-const throttle = (fn, limit) => {
-    let isThrottled = false;
-    return function() {
-        if (!isThrottled) {
-            fn.apply(this, arguments);
-            isThrottled = true;
-            setTimeout(() => isThrottled = false, limit);
-        }
+  /* Run a callback at most once per animation frame. */
+  const onFrame = (fn) => {
+    let queued = false;
+    return (...args) => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        fn(...args);
+      });
     };
-};
+  };
 
-if (navToggle && mainNav) {
-    const toggleMenu = (open) => {
-        mainNav.classList.toggle('open', open);
-        navToggle.classList.toggle('active', open);
-        document.body.style.overflow = open ? 'hidden' : '';
-        navToggle.setAttribute('aria-expanded', open);
-    };
-    
-    navToggle.addEventListener('click', () => toggleMenu(!mainNav.classList.contains('open')));
-    
-    // Close menu when clicking nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => toggleMenu(false));
+  /* ------------------------------------------------------------------
+     Header: stuck state + reading progress
+     ------------------------------------------------------------------ */
+  const header = $('#header');
+  const progress = $('#progress');
+  const toTop = $('#toTop');
+
+  const updateScrollState = onFrame(() => {
+    const y = window.scrollY;
+    if (header) header.classList.toggle('is-stuck', y > 8);
+
+    if (progress) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.setProperty('--p', max > 0 ? (y / max).toFixed(4) : '0');
+    }
+
+    if (toTop) toTop.classList.toggle('is-visible', y > 500);
+  });
+
+  /* ------------------------------------------------------------------
+     Back to top
+     ------------------------------------------------------------------ */
+  if (toTop) {
+    toTop.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion.matches ? 'auto' : 'smooth'
+      });
     });
-    
-    // Close menu on Escape key
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && mainNav.classList.contains('open')) {
-            toggleMenu(false);
-        }
-    });
-    
-    // Close menu when clicking outside (on the nav background)
-    mainNav.addEventListener('click', (e) => {
-        if (e.target === mainNav) {
-            toggleMenu(false);
-        }
-    });
-}
+  }
 
-// Active menu on scroll
-const sections = document.querySelectorAll('section');
-const navLinks = document.querySelectorAll('.nav-link');
-const handleScroll = throttle(() => {
-    const scrollPos = window.scrollY + 120;
-    let current = '';
-    sections.forEach(s => { if (scrollPos >= s.offsetTop && scrollPos < s.offsetTop + s.clientHeight) current = s.id; });
-    navLinks.forEach(l => { l.classList.toggle('active', l.getAttribute('href') === `#${current}`); });
-}, 100);
-window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('scroll', updateScrollState, { passive: true });
+  window.addEventListener('resize', updateScrollState, { passive: true });
+  updateScrollState();
 
-// Smooth scroll for all anchor links
-function smoothScrollTo(targetId) {
-    const targetElement = document.querySelector(targetId);
-    if (!targetElement) return;
-    
-    const headerOffset = 90;
-    const elementPosition = targetElement.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-    
-    window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-    });
-}
+  /* ------------------------------------------------------------------
+     Mobile navigation drawer
+     ------------------------------------------------------------------ */
+  const nav = $('#nav');
+  const navToggle = $('#navToggle');
+  const navScrim = $('#navScrim');
 
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
-        // Close mobile menu if open
-        if (mainNav && mainNav.classList.contains('open')) {
-            mainNav.classList.remove('open');
-            navToggle.classList.remove('active');
-            document.body.style.overflow = '';
-            navToggle.setAttribute('aria-expanded', 'false');
-        }
-        
-        smoothScrollTo(targetId);
-    });
-});
+  if (nav && navToggle && navScrim) {
+    let lastFocused = null;
 
-// Scroll to top
-const scrollBtn = document.getElementById('scrollToTop');
-if (scrollBtn) {
-    const toggleScroll = throttle(() => scrollBtn.classList.toggle('visible', window.scrollY > 400), 100);
-    window.addEventListener('scroll', toggleScroll, { passive: true });
-    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-}
+    const setNav = (open) => {
+      nav.classList.toggle('is-open', open);
+      navToggle.setAttribute('aria-expanded', String(open));
+      navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.style.overflow = open ? 'hidden' : '';
 
-// Intersection Observer for animations
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) {
-            e.target.style.animationDelay = `${(e.target.dataset.delay || 0) * 0.1}s`;
-            e.target.style.animation = 'fadeInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-            observer.unobserve(e.target);
-        }
-    });
-}, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
-
-document.querySelectorAll('.skill-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
-document.querySelectorAll('.project-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
-document.querySelectorAll('.service-card').forEach((el, i) => { el.style.opacity = '0'; el.dataset.delay = i; observer.observe(el); });
-document.querySelectorAll('.about-content, .contact-content').forEach(el => { el.style.opacity = '0'; observer.observe(el); });
-
-// Footer year
-const yr = document.getElementById('year');
-if (yr) yr.textContent = new Date().getFullYear();
-
-// Header scroll effect
-const header = document.querySelector('.site-header');
-const headerScroll = throttle(() => header.classList.toggle('scrolled', window.pageYOffset > 50), 100);
-window.addEventListener('scroll', headerScroll, { passive: true });
-
-// Image error handling
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.project-thumbnail').forEach(img => {
-        img.addEventListener('error', function() {
-            this.classList.add('hidden');
-            const ph = this.nextElementSibling;
-            if (ph?.classList.contains('project-placeholder')) ph.classList.add('visible');
+      if (open) {
+        lastFocused = document.activeElement;
+        navScrim.hidden = false;
+        requestAnimationFrame(() => {
+          navScrim.classList.add('is-open');
+          // The drawer is `visibility: hidden` until `.is-open` is applied, and
+          // focus() is a no-op on a hidden subtree — so wait for the next frame.
+          const first = nav.querySelector('a, button');
+          if (first) first.focus({ preventScroll: true });
         });
+      } else {
+        navScrim.classList.remove('is-open');
+        // Wait for the fade-out before removing it from the a11y tree.
+        setTimeout(() => { if (!nav.classList.contains('is-open')) navScrim.hidden = true; }, 320);
+        // Return focus where it came from, falling back to the toggle so keyboard
+        // users never get dumped back at the top of the document.
+        const restore = lastFocused instanceof HTMLElement && lastFocused !== document.body
+          ? lastFocused
+          : navToggle;
+        restore.focus({ preventScroll: true });
+      }
+    };
+
+    const isOpen = () => nav.classList.contains('is-open');
+
+    navToggle.addEventListener('click', () => setNav(!isOpen()));
+    navScrim.addEventListener('click', () => setNav(false));
+
+    // Close on link tap so the target section is actually visible.
+    nav.addEventListener('click', (e) => {
+      if (e.target.closest('a') && isOpen()) setNav(false);
     });
-});
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) return;
+
+      if (e.key === 'Escape') {
+        setNav(false);
+        return;
+      }
+
+      // Keep Tab inside the open drawer — it behaves as a modal.
+      if (e.key === 'Tab') {
+        const focusables = $$('a[href], button:not([disabled])', nav);
+        if (!focusables.length) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    // Reset drawer state if the viewport grows past the mobile breakpoint.
+    const desktop = window.matchMedia('(min-width: 861px)');
+    const syncBreakpoint = (e) => { if (e.matches && isOpen()) setNav(false); };
+    desktop.addEventListener('change', syncBreakpoint);
+  }
+
+  /* ------------------------------------------------------------------
+     Active section highlighting
+     ------------------------------------------------------------------ */
+  const navLinks = $$('.nav__link');
+  const sections = navLinks
+    .map((link) => {
+      const id = link.getAttribute('href');
+      return id && id.startsWith('#') ? document.querySelector(id) : null;
+    })
+    .filter(Boolean);
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const setActive = (id) => {
+      navLinks.forEach((link) => {
+        link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
+      });
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      // Pick the entry closest to the top of the viewport that is on screen.
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (visible) setActive(visible.target.id);
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+  }
+
+  /* ------------------------------------------------------------------
+     Reveal on scroll, with a stagger inside each grid
+     ------------------------------------------------------------------ */
+  const revealables = $$('.reveal');
+
+  if (!('IntersectionObserver' in window) || prefersReducedMotion.matches) {
+    revealables.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    // Stagger siblings so grids cascade instead of popping in all at once.
+    const groups = new Map();
+    revealables.forEach((el) => {
+      const parent = el.parentElement;
+      const index = groups.get(parent) ?? 0;
+      groups.set(parent, index + 1);
+      el.style.setProperty('--reveal-delay', `${Math.min(index, 6) * 70}ms`);
+    });
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    revealables.forEach((el) => revealObserver.observe(el));
+  }
+
+  /* ------------------------------------------------------------------
+     Project filters
+     ------------------------------------------------------------------ */
+  const filters = $$('.filter');
+  const workCards = $$('#workGrid .card--work');
+  const workEmpty = $('#workEmpty');
+
+  if (filters.length && workCards.length) {
+    filters.forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = button.dataset.filter;
+
+        filters.forEach((other) => {
+          const active = other === button;
+          other.classList.toggle('is-active', active);
+          other.setAttribute('aria-pressed', String(active));
+        });
+
+        let shown = 0;
+        workCards.forEach((card) => {
+          const match = target === 'all' || card.dataset.category === target;
+          card.classList.toggle('is-hidden', !match);
+          if (match) shown += 1;
+        });
+
+        if (workEmpty) workEmpty.hidden = shown > 0;
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Footer year
+     ------------------------------------------------------------------ */
+  const year = $('#year');
+  if (year) year.textContent = String(new Date().getFullYear());
+
+  /* ------------------------------------------------------------------
+     Hero particle field
+     Scoped to the hero only, DPR-aware, and paused whenever it is off
+     screen or the tab is hidden so it costs nothing below the fold.
+     ------------------------------------------------------------------ */
+  const canvas = $('#heroCanvas');
+  const hero = $('.hero');
+
+  if (canvas && hero && !prefersReducedMotion.matches) {
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    if (ctx) {
+      const CONFIG = {
+        density: 22000,   // one particle per N css pixels of hero area
+        maxParticles: 46,
+        linkDistance: 130,
+        speed: 0.22,
+        dotColor: 'rgba(0, 151, 167, ',
+        lineColor: 'rgba(0, 188, 212, '
+      };
+
+      let particles = [];
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let rafId = null;
+      let running = false;
+
+      const seed = () => {
+        const count = Math.min(Math.floor((width * height) / CONFIG.density), CONFIG.maxParticles);
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * CONFIG.speed,
+          vy: (Math.random() - 0.5) * CONFIG.speed,
+          r: Math.random() * 1.8 + 1,
+          a: Math.random() * 0.35 + 0.18
+        }));
+      };
+
+      const resize = () => {
+        const rect = hero.getBoundingClientRect();
+        width = rect.width;
+        height = rect.height;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        seed();
+      };
+
+      const draw = () => {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < particles.length; i += 1) {
+          const p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < -10) p.x = width + 10;
+          else if (p.x > width + 10) p.x = -10;
+          if (p.y < -10) p.y = height + 10;
+          else if (p.y > height + 10) p.y = -10;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `${CONFIG.dotColor}${p.a})`;
+          ctx.fill();
+
+          // Only look forward so each pair is linked once.
+          for (let j = i + 1; j < particles.length; j += 1) {
+            const q = particles[j];
+            const dx = p.x - q.x;
+            const dy = p.y - q.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < CONFIG.linkDistance * CONFIG.linkDistance) {
+              const alpha = (1 - Math.sqrt(distSq) / CONFIG.linkDistance) * 0.16;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = `${CONFIG.lineColor}${alpha})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+
+        rafId = requestAnimationFrame(draw);
+      };
+
+      const start = () => {
+        if (running) return;
+        running = true;
+        rafId = requestAnimationFrame(draw);
+      };
+
+      const stop = () => {
+        running = false;
+        if (rafId !== null) cancelAnimationFrame(rafId);
+        rafId = null;
+      };
+
+      resize();
+      start();
+
+      const onResize = onFrame(resize);
+      window.addEventListener('resize', onResize, { passive: true });
+
+      // Stop the loop once the hero scrolls away.
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+          entries[0].isIntersecting ? start() : stop();
+        }, { threshold: 0 }).observe(hero);
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        document.hidden ? stop() : start();
+      });
+
+      // Drop the animation entirely if the user turns motion off mid-session.
+      prefersReducedMotion.addEventListener('change', (e) => {
+        if (e.matches) {
+          stop();
+          ctx.clearRect(0, 0, width, height);
+        } else {
+          start();
+        }
+      });
+    }
+  }
+})();
