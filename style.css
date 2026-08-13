@@ -16,8 +16,9 @@
    11  Services
    12  Contact & form
    13  Footer
-   14  Motion & reveal
-   15  Print (Download résumé → PDF)
+   14  Touch & small screens
+   15  Motion & reveal
+   16  Print (Download résumé → PDF)
    ========================================================================== */
 
 /* ==========================================================================
@@ -71,13 +72,46 @@
   /* Metrics */
   --header-h:    68px;
   --container:   1120px;
-  --gutter:      clamp(20px, 5vw, 40px);
-  --section-y:   clamp(64px, 8vw, 112px);
+  --gutter:      clamp(18px, 5vw, 40px);
+  --section-y:   clamp(56px, 8vw, 112px);
+
+  /* Notch / rounded-corner insets. Declared as tokens so every fixed or
+     full-bleed element reads the same numbers. viewport-fit=cover in the
+     <meta> is what makes these non-zero.
+
+     They default to 0px and are only swapped for env() behind @supports below.
+     A custom property is validated where it is *used*, not where it is set, so
+     an unsupported env() would not fall back — it would invalidate every
+     `calc(... + var(--safe-r))` that reads it and collapse the padding to
+     nothing. Keeping the plain 0px here means the worst case is no inset. */
+  --safe-l:      0px;
+  --safe-r:      0px;
+  --safe-b:      0px;
+  --safe-t:      0px;
+
+  /* Minimum comfortable tap target (WCAG 2.5.8 is 24px; 44px is the iOS/
+     Material guidance and what touch pointers actually get here). */
+  --tap:         44px;
 
   /* Motion */
   --ease:        cubic-bezier(.4, 0, .2, 1);
   --fast:        .2s var(--ease);
   --slow:        .45s var(--ease);
+}
+
+@supports (padding: env(safe-area-inset-left)) {
+  :root {
+    --safe-l: env(safe-area-inset-left);
+    --safe-r: env(safe-area-inset-right);
+    --safe-b: env(safe-area-inset-bottom);
+    --safe-t: env(safe-area-inset-top);
+  }
+}
+
+/* Phones get a shorter bar so the fixed header eats less of a short viewport.
+   scroll-padding-top below reads the same token, so anchor landings follow. */
+@media (max-width: 600px) {
+  :root { --header-h: 60px; }
 }
 
 /* ==========================================================================
@@ -88,7 +122,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 24px);
+  scroll-padding-top: calc(var(--header-h) + 20px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -99,8 +133,14 @@ body {
   color: var(--body);
   background: var(--paper);
   overflow-x: hidden;
+  /* A stray long token (an email, a URL) must wrap rather than widen the page —
+     on a 320px phone that was the difference between a clean layout and a
+     17px sideways scroll. */
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Grey flash on tap is replaced by the explicit :active states further down. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1, h2, h3, h4 {
@@ -108,6 +148,7 @@ h1, h2, h3, h4 {
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -.02em;
+  text-wrap: balance;
 }
 
 a { color: var(--sky-700); text-decoration: none; transition: color var(--fast); }
@@ -161,6 +202,10 @@ button { background: none; border: 0; cursor: pointer; }
   max-width: var(--container);
   margin-inline: auto;
   padding-inline: var(--gutter);
+  /* Landscape on a notched phone puts the cutout over one side of the page;
+     the gutter absorbs it instead of the text doing so. */
+  padding-left:  calc(var(--gutter) + var(--safe-l));
+  padding-right: calc(var(--gutter) + var(--safe-r));
 }
 
 .section { padding-block: var(--section-y); }
@@ -200,6 +245,7 @@ button { background: none; border: 0; cursor: pointer; }
   align-items: center;
   justify-content: center;
   gap: 10px;
+  min-height: var(--tap);
   padding: 13px 26px;
   border: 1px solid transparent;
   border-radius: var(--r-pill);
@@ -207,6 +253,7 @@ button { background: none; border: 0; cursor: pointer; }
   font-weight: 500;
   letter-spacing: .01em;
   white-space: nowrap;
+  touch-action: manipulation; /* kills the 300ms double-tap-zoom delay */
   transition: background var(--fast), color var(--fast),
               border-color var(--fast), box-shadow var(--fast), transform var(--fast);
 }
@@ -327,12 +374,15 @@ button { background: none; border: 0; cursor: pointer; }
 
 .nav-toggle {
   display: none;
-  width: 42px; height: 42px;
+  width: var(--tap); height: var(--tap);
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--paper);
+  touch-action: manipulation;
+  transition: background var(--fast), border-color var(--fast);
 }
+.nav-toggle:active { background: var(--sky-50); border-color: var(--sky); }
 .nav-toggle i {
   display: block;
   width: 18px; height: 1.5px;
@@ -350,30 +400,50 @@ button { background: none; border: 0; cursor: pointer; }
   .nav {
     position: fixed;
     top: var(--header-h); right: 0;
-    width: min(320px, 84vw);
+    width: min(340px, 86vw);
+    /* dvh, not vh: the mobile URL bar collapsing must not leave the drawer
+       taller than the screen with its last link unreachable. */
     height: calc(100dvh - var(--header-h));
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    padding: 28px var(--gutter);
+    padding: 22px calc(var(--gutter) + var(--safe-r)) calc(28px + var(--safe-b)) var(--gutter);
     background: var(--paper);
     border-left: 1px solid var(--line);
     box-shadow: var(--shadow-lg);
     transform: translateX(102%);
-    transition: transform var(--slow);
     overflow-y: auto;
+    /* Flicking past the end of the drawer must not start scrolling the page
+       underneath it. */
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    /* Closed, the drawer is off-screen but still in the tab order and still
+       read by screen readers. visibility:hidden takes it out of both — held
+       back until the slide-out finishes so the animation stays visible. */
+    visibility: hidden;
+    transition: transform var(--slow), visibility 0s linear var(--slow);
   }
-  .nav.is-open { transform: translateX(0); }
+  .nav.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform var(--slow), visibility 0s;
+  }
   .nav__list { flex-direction: column; align-items: stretch; gap: 2px; }
   .nav__link {
-    display: block;
-    padding: 13px 4px;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    min-height: 52px; /* full-width comfortable target, not a 14px text hitbox */
+    padding: 12px 4px;
+    font-size: 1.02rem;
     border-bottom: 1px solid var(--line);
   }
   .nav__link::after { display: none; }
-  .nav__link.is-active { color: var(--sky-700); }
-  .nav__cta { margin-top: 20px; }
+  .nav__link.is-active { color: var(--sky-700); font-weight: 500; }
+  .nav__cta {
+    margin-top: 22px;
+    padding: 14px 22px;
+    font-size: var(--t-sm);
+  }
 }
 
 .nav-scrim {
@@ -507,7 +577,7 @@ button { background: none; border: 0; cursor: pointer; }
 }
 
 /* Portrait */
-.portrait { position: relative; }
+.portrait { position: relative; display: grid; justify-items: center; }
 .portrait__frame {
   width: clamp(200px, 24vw, 290px);
   aspect-ratio: 1;
@@ -524,28 +594,65 @@ button { background: none; border: 0; cursor: pointer; }
   object-fit: cover;
 }
 
+/* Single column below 900px. The portrait cell then spans the full width, so
+   both the cell and the frame inside it have to be told to centre — left to
+   itself the fixed-width frame parks against the left gutter and reads as a
+   layout bug rather than a portrait. */
 @media (max-width: 900px) {
-  .hero__inner { grid-template-columns: 1fr; }
-  .hero__aside { order: -1; }
-  .portrait__frame { width: clamp(160px, 44vw, 220px); }
+  .hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: clamp(28px, 6vw, 44px);
+  }
+  .hero__aside {
+    order: -1;
+    width: 100%;
+    display: grid;
+    justify-items: center;
+  }
+  .hero__content { width: 100%; }
+
+  .portrait { justify-self: center; }
+  /* Sized off the viewport so it scales with the phone instead of sitting at
+     one fixed size from a 360px screen up to a tablet. */
+  .portrait__frame {
+    width: clamp(168px, 52vw, 260px);
+    padding: 7px;
+    border-radius: 28px;
+  }
+  .portrait__frame img { border-radius: 22px; }
+
+  /* Soft halo behind the frame — gives the centred portrait something to sit
+     on so it reads as the deliberate top of the page. */
+  .portrait::before {
+    content: '';
+    position: absolute;
+    inset: -14%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, .17) 0%, rgba(56, 189, 248, 0) 68%);
+  }
 }
 
 /* Key figures strip */
 /* Column counts are fixed (2 → 4) rather than auto-fit: the 1px gaps expose the
    container background, so an orphan cell would show as an empty tinted block. */
+/* minmax(0, 1fr) rather than 1fr: grid items default to min-width:auto, so the
+   1.9rem figures ("Kerala, IN") were setting the column floor and pushing the
+   whole strip past a 320px viewport. */
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
-  margin-top: clamp(48px, 6vw, 72px);
+  margin-top: clamp(40px, 6vw, 72px);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--line);
   overflow: hidden;
 }
-@media (min-width: 780px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 780px) { .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-.stat { padding: 26px 28px; background: var(--paper); }
+.stat { padding: clamp(18px, 4.5vw, 26px) clamp(16px, 4.5vw, 28px); background: var(--paper); }
 .stat dd { text-wrap: balance; }
 .stat dt {
   color: var(--muted);
@@ -556,8 +663,9 @@ button { background: none; border: 0; cursor: pointer; }
 .stat dd {
   margin-top: 6px;
   color: var(--ink);
-  font-size: 1.9rem;
+  font-size: clamp(1.35rem, 5.2vw, 1.9rem);
   font-weight: 600;
+  line-height: 1.25;
   letter-spacing: -.03em;
 }
 .stat dd em { color: var(--sky); font-style: normal; }
@@ -571,7 +679,7 @@ button { background: none; border: 0; cursor: pointer; }
   gap: clamp(32px, 5vw, 72px);
   align-items: start;
 }
-@media (max-width: 860px) { .profile { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .profile { grid-template-columns: minmax(0, 1fr); } }
 
 .profile__text p + p { margin-top: 18px; }
 .profile__text strong { color: var(--ink); font-weight: 600; }
@@ -629,14 +737,28 @@ button { background: none; border: 0; cursor: pointer; }
   font-size: var(--t-sm);
   font-weight: 500;
   text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .factsheet dd a { color: var(--sky-700); }
 
-.socials { display: flex; gap: 10px; }
+/* Narrow phones: "Availability" beside "Freelance & full-time" leaves each half
+   a handful of characters, and the unbreakable email token was what pushed the
+   card past the viewport. Stack the pair and left-align it instead. */
+@media (max-width: 560px) {
+  .factsheet div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 13px 0;
+  }
+  .factsheet dd { text-align: left; }
+}
+
+.socials { display: flex; flex-wrap: wrap; gap: 10px; }
 .socials a {
   display: grid;
   place-items: center;
-  width: 40px; height: 40px;
+  width: var(--tap); height: var(--tap);
   border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--body);
@@ -663,9 +785,12 @@ button { background: none; border: 0; cursor: pointer; }
    08  EXPERIENCE
    A rail with dated entries — the spine of the résumé.
    ========================================================================== */
+/* The rail indent is one token so the spine, the dots and the text all move
+   together — phones give it less room than desktop. */
 .timeline {
+  --rail: clamp(22px, 6vw, 34px);
   position: relative;
-  padding-left: 34px;
+  padding-left: var(--rail);
 }
 .timeline::before {
   content: '';
@@ -675,12 +800,12 @@ button { background: none; border: 0; cursor: pointer; }
   background: linear-gradient(180deg, var(--sky) 0%, var(--line) 100%);
 }
 
-.entry { position: relative; padding-bottom: clamp(32px, 4vw, 46px); }
+.entry { position: relative; padding-bottom: clamp(30px, 4vw, 46px); }
 .entry:last-child { padding-bottom: 0; }
 .entry::before {
   content: '';
   position: absolute;
-  left: -34px; top: 9px;
+  left: calc(var(--rail) * -1); top: 9px;
   width: 11px; height: 11px;
   border: 2.5px solid var(--sky);
   border-radius: 50%;
@@ -747,8 +872,8 @@ button { background: none; border: 0; cursor: pointer; }
    ========================================================================== */
 .skills {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: clamp(18px, 2.4vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: clamp(16px, 2.4vw, 26px);
 }
 
 .skillset {
@@ -803,33 +928,48 @@ button { background: none; border: 0; cursor: pointer; }
   stroke-linejoin: round;
 }
 
-/* Tech logo strip */
+/* Tech logo strip.
+   Items carry an explicit width instead of sizing to their label: the labels
+   are wider than the 40px logos and by very different amounts ("CSS3" vs
+   "JAVASCRIPT"), so intrinsic widths wrapped into a ragged stack on a phone.
+   Equal widths + centred rows means 5 items break to a tidy 3-over-2. */
 .tech {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(20px, 4vw, 52px);
-  margin-top: clamp(40px, 5vw, 60px);
-  padding-top: clamp(32px, 4vw, 44px);
+  gap: clamp(18px, 3vw, 28px) clamp(10px, 2.5vw, 52px);
+  margin-top: clamp(36px, 5vw, 60px);
+  padding-top: clamp(28px, 4vw, 44px);
   border-top: 1px solid var(--line);
 }
+
 .tech li {
+  flex: 0 0 auto;
+  width: clamp(74px, 20vw, 104px);
   display: grid;
   justify-items: center;
   gap: 10px;
   color: var(--muted);
-  font-size: var(--t-xs);
+  font-size: clamp(.68rem, 2.4vw, .78rem);
   letter-spacing: .06em;
   text-transform: uppercase;
+  text-align: center;
 }
 .tech img {
-  width: 40px; height: 40px;
+  width: clamp(34px, 9vw, 40px); height: clamp(34px, 9vw, 40px);
   object-fit: contain;
   filter: grayscale(1);
   opacity: .55;
   transition: filter var(--fast), opacity var(--fast), transform var(--fast);
 }
 .tech li:hover img { filter: none; opacity: 1; transform: translateY(-3px); }
+
+/* Phones: pin the item to exactly a third of the row so five logos break to a
+   balanced 3-over-2 instead of the 4-over-1 that intrinsic widths produced. */
+@media (max-width: 640px) {
+  .tech { gap: 22px 8px; }
+  .tech li { width: calc((100% - 16px) / 3); }
+}
 
 /* ==========================================================================
    10  SELECTED WORK
@@ -838,18 +978,20 @@ button { background: none; border: 0; cursor: pointer; }
   display: flex;
   flex-wrap: wrap;
   gap: 9px;
-  margin-bottom: clamp(28px, 3.5vw, 40px);
+  margin-bottom: clamp(24px, 3.5vw, 40px);
 }
 .filter {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 40px;
   padding: 9px 18px;
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
   background: var(--paper);
   color: var(--body);
   font-size: var(--t-sm);
+  touch-action: manipulation;
   transition: all var(--fast);
 }
 .filter span {
@@ -868,8 +1010,10 @@ button { background: none; border: 0; cursor: pointer; }
 
 .work {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: clamp(20px, 2.6vw, 30px);
+  /* min() keeps the track from demanding 300px on a 280px-wide phone column,
+     which is what turns auto-fill into an overflow instead of a single card. */
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: clamp(18px, 2.6vw, 30px);
 }
 
 .project {
@@ -933,7 +1077,7 @@ button { background: none; border: 0; cursor: pointer; }
   transform: translateY(0);
 }
 
-.project__body { padding: 22px 24px 24px; }
+.project__body { padding: clamp(18px, 5vw, 22px) clamp(18px, 5vw, 24px) clamp(20px, 5vw, 24px); }
 .project__cat {
   color: var(--sky-700);
   font-size: var(--t-xs);
@@ -973,8 +1117,8 @@ button { background: none; border: 0; cursor: pointer; }
    ========================================================================== */
 .services {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: clamp(18px, 2.4vw, 26px);
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: clamp(16px, 2.4vw, 26px);
 }
 .service {
   position: relative;
@@ -1027,7 +1171,7 @@ button { background: none; border: 0; cursor: pointer; }
   gap: clamp(32px, 5vw, 68px);
   align-items: start;
 }
-@media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .contact { grid-template-columns: minmax(0, 1fr); } }
 
 .contact__list { display: grid; gap: 12px; margin-top: 32px; }
 .contact__list li { }
@@ -1096,17 +1240,25 @@ button { background: none; border: 0; cursor: pointer; }
   background: var(--paper);
   color: var(--ink);
   font-size: var(--t-sm);
+  /* iOS zooms the whole page in when a focused field is under 16px. The 14px
+     look is kept on desktop and traded for 16px at touch sizes. */
+  font-size: max(var(--t-sm), 16px);
+  -webkit-appearance: none;
+  appearance: none;
   transition: border-color var(--fast), box-shadow var(--fast);
 }
+@media (min-width: 901px) { .field input, .field textarea { font-size: var(--t-sm); } }
+
 .field textarea { resize: vertical; min-height: 130px; }
 .field label {
   position: absolute;
   left: 17px; top: 15px;
   color: var(--muted);
-  font-size: var(--t-sm);
+  font-size: max(var(--t-sm), 16px); /* tracks the input, which is bumped for iOS */
   pointer-events: none;
   transition: all var(--fast);
 }
+@media (min-width: 901px) { .field label { font-size: var(--t-sm); } }
 .field input:focus, .field textarea:focus {
   outline: none;
   border-color: var(--sky);
@@ -1196,7 +1348,8 @@ button { background: none; border: 0; cursor: pointer; }
    -------------------------------------------------------------------------- */
 .wa {
   position: fixed;
-  right: 22px; bottom: 22px;
+  right: calc(22px + var(--safe-r));
+  bottom: calc(22px + var(--safe-b));
   z-index: 85;
   display: inline-flex;
   align-items: center;
@@ -1251,13 +1404,109 @@ button { background: none; border: 0; cursor: pointer; }
 }
 
 @media (max-width: 640px) {
-  .wa { right: 16px; bottom: 16px; }
-  .wa__icon { width: 52px; height: 52px; }
+  .wa {
+    right: calc(14px + var(--safe-r));
+    bottom: calc(14px + var(--safe-b));
+  }
+  .wa__icon { width: 54px; height: 54px; }
   .wa__icon svg { width: 26px; height: 26px; }
+  /* No hover on a phone, so the label can never expand — the halo animation is
+     the only thing that would keep repainting a permanently collapsed pill. */
+  .wa__label { display: none; }
 }
 
 /* ==========================================================================
-   14  MOTION & REVEAL
+   14  TOUCH & SMALL SCREENS
+   Placed after every component so it wins on specificity ties. Two concerns:
+   (a) pointer type — a finger has no hover, so hover-only affordances have to
+   become permanent and hover transforms must not stick after a tap;
+   (b) width — the last refinements that only make sense on a phone.
+   ========================================================================== */
+
+/* --- (a) Touch pointers ------------------------------------------------- */
+@media (hover: none) {
+  /* Sticky :hover. A tap leaves the element in :hover until you tap elsewhere,
+     so every lift/scale hover state would freeze mid-effect on a phone. Reset
+     them and let the :active rules below carry the feedback instead. */
+  .btn--primary:hover, .btn--ghost:hover, .skillset:hover, .service:hover,
+  .project:hover, .socials a:hover, .wa:hover, .tech li:hover img {
+    transform: none;
+  }
+  .project:hover { box-shadow: none; border-color: var(--line); }
+  .project:hover .project__media img { transform: none; }
+  .skillset:hover, .service:hover { box-shadow: none; border-color: var(--line); }
+  .contact__list a:hover { transform: none; background: var(--paper); border-color: var(--line); }
+  .filter:hover { border-color: var(--line); color: var(--body); }
+  .filter.is-active:hover { border-color: var(--sky-600); color: #fff; }
+
+  /* The "opens in a new tab" arrow was hover-revealed, i.e. invisible on every
+     phone. It is the card's only affordance, so on touch it stays on. */
+  .project__open { opacity: 1; transform: none; }
+
+  /* Logos never un-grey without hover; meet them halfway so the strip does not
+     read as disabled. */
+  .tech img { opacity: .75; }
+}
+
+/* Press feedback. -webkit-tap-highlight-color is off, so without these a tap
+   would give no acknowledgement at all until the page navigates. */
+@media (hover: none) {
+  .btn:active { transform: scale(.97); }
+  .project:active { transform: scale(.985); border-color: var(--sky-100); }
+  .filter:active { background: var(--sky-50); }
+  .contact__list a:active { background: var(--sky-50); border-color: var(--sky); }
+  .socials a:active { background: var(--sky-50); border-color: var(--sky); }
+  .nav__link:active { color: var(--sky-700); }
+  .wa:active { transform: scale(.94); }
+  .btn:active, .project:active, .wa:active { transition-duration: .08s; }
+}
+
+/* --- (b) Phones --------------------------------------------------------- */
+@media (max-width: 560px) {
+  /* Full-width stacked buttons: easier to hit, and two pills of different
+     widths sitting left of a lot of empty space looked unfinished. */
+  .hero__actions { display: grid; gap: 10px; margin-top: 28px; }
+  .hero__actions .btn { width: 100%; }
+
+  /* One fact per row. Wrapped inline items were breaking mid-address and
+     leaving a ragged two-column block. */
+  .hero__facts { display: grid; gap: 11px; margin-top: 24px; }
+  .hero__facts li { align-items: flex-start; }
+  .hero__facts svg { margin-top: 4px; }
+  .hero__facts a { overflow-wrap: anywhere; }
+
+  .hero__status { margin-bottom: 18px; }
+  .hero__rule { margin: 18px 0; }
+  .hero__lead { max-width: none; }
+
+  /* Long addresses in the contact cards get the same treatment. */
+  .contact__v { overflow-wrap: anywhere; }
+  .contact__list a, .contact__static { padding: 14px 15px; gap: 13px; }
+
+  /* Role and its period badge stop competing for one line. */
+  .entry__head { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  .section__head { margin-bottom: 30px; }
+  .form { padding: 22px 18px; }
+  .factsheet { padding: 22px 20px; }
+
+  /* Footer columns read better stacked than as two cramped halves. */
+  .footer__bottom { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+/* Landscape phones are short, not narrow — the hero's vertical rhythm is what
+   needs to give, otherwise the name alone fills the screen. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .hero { padding-top: calc(var(--header-h) + 28px); padding-bottom: 40px; }
+  .hero__inner { grid-template-columns: auto minmax(0, 1fr); justify-items: start; }
+  .hero__aside { order: 0; width: auto; }
+  .portrait__frame { width: 150px; }
+  .portrait::before { display: none; }
+  .stats { margin-top: 32px; }
+}
+
+/* ==========================================================================
+   15  MOTION & REVEAL
    Opt-in: add class="reveal". Gated on <html class="js"> so a no-JS visitor
    never gets a permanently invisible section.
    ========================================================================== */
@@ -1279,7 +1528,7 @@ button { background: none; border: 0; cursor: pointer; }
 }
 
 /* ==========================================================================
-   15  PRINT
+   16  PRINT
    "Download résumé" calls window.print(). Everything below turns the page
    into an A4 CV: chrome hidden, colour dropped, screenshots suppressed,
    link targets spelled out.
@@ -1320,14 +1569,20 @@ button { background: none; border: 0; cursor: pointer; }
   .section { padding-top: 9mm; }
   .container { max-width: none; padding-inline: 0; }
 
-  /* Identity block */
+  /* Identity block.
+     A4 is ~794px wide, so the max-width:900px mobile rules match on paper too —
+     the centred single-column portrait treatment has to be unwound here. */
   .hero__inner {
     grid-template-columns: 1fr auto;
+    justify-items: stretch;
     gap: 10mm;
     align-items: start;
     padding-bottom: 5mm;
     border-bottom: 1pt solid #000;
   }
+  .hero__aside { order: 0; width: auto; display: block; }
+  .portrait { display: block; }
+  .portrait::before { display: none; }
   .hero__name { font-size: 22pt; }
   .hero__role { font-size: 11pt; color: #000; }
   .hero__rule { display: none; }

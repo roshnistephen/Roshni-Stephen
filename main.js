@@ -19,12 +19,45 @@
     const scrim = document.getElementById('navScrim');
     if (!nav || !toggle || !scrim) return;
 
+    // iOS Safari ignores `overflow:hidden` on <body> — the page keeps scrolling
+    // behind the open drawer. Pinning the body with position:fixed is the only
+    // thing that holds, and it drops the scroll position, so stash and restore it.
+    let lockedY = 0;
+
+    const lockScroll = () => {
+      lockedY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${lockedY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    };
+
+    const unlockScroll = () => {
+      const root = document.documentElement;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+
+      // Restoring a position, not navigating — the page's smooth scrolling would
+      // turn it into a visible glide back up, so it is suspended for this jump.
+      const behavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, lockedY);
+      root.style.scrollBehavior = behavior;
+    };
+
     const setOpen = (open) => {
+      const wasOpen = nav.classList.contains('is-open');
+      if (open === wasOpen) return;
+
       nav.classList.toggle('is-open', open);
       scrim.classList.toggle('is-open', open);
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      document.body.style.overflow = open ? 'hidden' : '';
+
+      if (open) lockScroll();
+      else unlockScroll();
 
       // hidden must lag the class so the scrim can fade out before it leaves the box tree.
       if (open) scrim.hidden = false;

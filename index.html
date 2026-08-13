@@ -52,7 +52,9 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"></noscript>
 
 <!-- ============ STYLES ============ -->
-<link rel="stylesheet" href="style.css">
+<!-- .htaccess caches CSS/JS for a year, so the ?v= stamp is what lets a change
+     reach someone who has already visited. Bump it on every deploy. -->
+<link rel="stylesheet" href="style.css?v=20260813">
 <!-- Flag JS before first paint so scroll-reveal never hides content for no-JS users. -->
 <script>document.documentElement.classList.add('js');</script>
 
@@ -892,7 +894,7 @@
   </span>
 </a>
 
-<script src="main.js" defer></script>
-<script src="contact.js" defer></script>
+<script src="main.js?v=20260813" defer></script>
+<script src="contact.js?v=20260813" defer></script>
 </body>
 </html>
