@@ -1,368 +1,285 @@
 /* ==========================================================================
-   Roshni Stephen — Portfolio
-   UI behaviour: navigation, scroll state, reveals, project filters, hero canvas.
+   Roshni Stephen — portfolio / résumé
+   Nav drawer · header state · scroll spy · reveals · project filters ·
+   floating WhatsApp · print · hero particles
+
+   No dependencies, no build step.
    ========================================================================== */
 (() => {
   'use strict';
 
-  const $  = (sel, ctx = document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /* ------------------------------------------------------------------ *
+   * 1. Mobile navigation drawer
+   * ------------------------------------------------------------------ */
+  (() => {
+    const nav = document.getElementById('nav');
+    const toggle = document.getElementById('navToggle');
+    const scrim = document.getElementById('navScrim');
+    if (!nav || !toggle || !scrim) return;
 
-  /* Run a callback at most once per animation frame. */
-  const onFrame = (fn) => {
-    let queued = false;
-    return (...args) => {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        fn(...args);
-      });
-    };
-  };
-
-  /* ------------------------------------------------------------------
-     Header: stuck state + reading progress
-     ------------------------------------------------------------------ */
-  const header = $('#header');
-  const progress = $('#progress');
-  const toTop = $('#toTop');
-
-  const updateScrollState = onFrame(() => {
-    const y = window.scrollY;
-    if (header) header.classList.toggle('is-stuck', y > 8);
-
-    if (progress) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      progress.style.setProperty('--p', max > 0 ? (y / max).toFixed(4) : '0');
-    }
-
-    if (toTop) toTop.classList.toggle('is-visible', y > 500);
-  });
-
-  /* ------------------------------------------------------------------
-     Back to top
-     ------------------------------------------------------------------ */
-  if (toTop) {
-    toTop.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: prefersReducedMotion.matches ? 'auto' : 'smooth'
-      });
-    });
-  }
-
-  window.addEventListener('scroll', updateScrollState, { passive: true });
-  window.addEventListener('resize', updateScrollState, { passive: true });
-  updateScrollState();
-
-  /* ------------------------------------------------------------------
-     Mobile navigation drawer
-     ------------------------------------------------------------------ */
-  const nav = $('#nav');
-  const navToggle = $('#navToggle');
-  const navScrim = $('#navScrim');
-
-  if (nav && navToggle && navScrim) {
-    let lastFocused = null;
-
-    const setNav = (open) => {
+    const setOpen = (open) => {
       nav.classList.toggle('is-open', open);
-      navToggle.setAttribute('aria-expanded', String(open));
-      navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      scrim.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       document.body.style.overflow = open ? 'hidden' : '';
 
-      if (open) {
-        lastFocused = document.activeElement;
-        navScrim.hidden = false;
-        requestAnimationFrame(() => {
-          navScrim.classList.add('is-open');
-          // The drawer is `visibility: hidden` until `.is-open` is applied, and
-          // focus() is a no-op on a hidden subtree — so wait for the next frame.
-          const first = nav.querySelector('a, button');
-          if (first) first.focus({ preventScroll: true });
-        });
-      } else {
-        navScrim.classList.remove('is-open');
-        // Wait for the fade-out before removing it from the a11y tree.
-        setTimeout(() => { if (!nav.classList.contains('is-open')) navScrim.hidden = true; }, 320);
-        // Return focus where it came from, falling back to the toggle so keyboard
-        // users never get dumped back at the top of the document.
-        const restore = lastFocused instanceof HTMLElement && lastFocused !== document.body
-          ? lastFocused
-          : navToggle;
-        restore.focus({ preventScroll: true });
-      }
+      // hidden must lag the class so the scrim can fade out before it leaves the box tree.
+      if (open) scrim.hidden = false;
+      else setTimeout(() => { scrim.hidden = true; }, 200);
     };
 
-    const isOpen = () => nav.classList.contains('is-open');
+    toggle.addEventListener('click', () => {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+    scrim.addEventListener('click', () => setOpen(false));
 
-    navToggle.addEventListener('click', () => setNav(!isOpen()));
-    navScrim.addEventListener('click', () => setNav(false));
-
-    // Close on link tap so the target section is actually visible.
+    // Any in-drawer link or the résumé button closes it.
     nav.addEventListener('click', (e) => {
-      if (e.target.closest('a') && isOpen()) setNav(false);
+      if (e.target.closest('a, button')) setOpen(false);
     });
 
     document.addEventListener('keydown', (e) => {
-      if (!isOpen()) return;
-
-      if (e.key === 'Escape') {
-        setNav(false);
-        return;
-      }
-
-      // Keep Tab inside the open drawer — it behaves as a modal.
-      if (e.key === 'Tab') {
-        const focusables = $$('a[href], button:not([disabled])', nav);
-        if (!focusables.length) return;
-
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
       }
     });
 
-    // Reset drawer state if the viewport grows past the mobile breakpoint.
-    const desktop = window.matchMedia('(min-width: 861px)');
-    const syncBreakpoint = (e) => { if (e.matches && isOpen()) setNav(false); };
-    desktop.addEventListener('change', syncBreakpoint);
-  }
+    // Leaving the mobile breakpoint must not strand the drawer open.
+    window.matchMedia('(min-width: 901px)').addEventListener('change', (e) => {
+      if (e.matches) setOpen(false);
+    });
+  })();
 
-  /* ------------------------------------------------------------------
-     Active section highlighting
-     ------------------------------------------------------------------ */
-  const navLinks = $$('.nav__link');
-  const sections = navLinks
-    .map((link) => {
-      const id = link.getAttribute('href');
-      return id && id.startsWith('#') ? document.querySelector(id) : null;
-    })
-    .filter(Boolean);
+  /* ------------------------------------------------------------------ *
+   * 2. Header shadow once the page leaves the top
+   * ------------------------------------------------------------------ */
+  (() => {
+    const header = document.getElementById('header');
+    if (!header) return;
 
-  if (sections.length && 'IntersectionObserver' in window) {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        header.classList.toggle('is-stuck', window.scrollY > 12);
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ------------------------------------------------------------------ *
+   * 3. Scroll spy — highlight the nav link for the section in view
+   * ------------------------------------------------------------------ */
+  (() => {
+    const links = [...document.querySelectorAll('.nav__link')];
+    const sections = links
+      .map((link) => document.querySelector(link.getAttribute('href')))
+      .filter(Boolean);
+    if (!sections.length || !('IntersectionObserver' in window)) return;
+
     const setActive = (id) => {
-      navLinks.forEach((link) => {
+      links.forEach((link) => {
         link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
       });
     };
 
-    const sectionObserver = new IntersectionObserver((entries) => {
-      // Pick the entry closest to the top of the viewport that is on screen.
+    // Watch a band across the middle of the viewport so the active link
+    // changes when a section genuinely occupies the screen.
+    const observer = new IntersectionObserver((entries) => {
       const visible = entries
-        .filter((e) => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
       if (visible) setActive(visible.target.id);
-    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
 
-    sections.forEach((section) => sectionObserver.observe(section));
-  }
+    sections.forEach((section) => observer.observe(section));
+  })();
 
-  /* ------------------------------------------------------------------
-     Reveal on scroll, with a stagger inside each grid
-     ------------------------------------------------------------------ */
-  const revealables = $$('.reveal');
+  /* ------------------------------------------------------------------ *
+   * 4. Reveal on scroll
+   * ------------------------------------------------------------------ */
+  (() => {
+    const items = [...document.querySelectorAll('.reveal')];
+    if (!items.length) return;
 
-  if (!('IntersectionObserver' in window) || prefersReducedMotion.matches) {
-    revealables.forEach((el) => el.classList.add('is-visible'));
-  } else {
-    // Stagger siblings so grids cascade instead of popping in all at once.
-    const groups = new Map();
-    revealables.forEach((el) => {
-      const parent = el.parentElement;
-      const index = groups.get(parent) ?? 0;
-      groups.set(parent, index + 1);
-      el.style.setProperty('--reveal-delay', `${Math.min(index, 6) * 70}ms`);
-    });
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-in'));
+      return;
+    }
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry, i) => {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
+        // Stagger siblings that enter together, but cap it so nothing lags.
+        entry.target.style.transitionDelay = `${Math.min(i * 70, 280)}ms`;
+        entry.target.classList.add('is-in');
+        obs.unobserve(entry.target);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
 
-    revealables.forEach((el) => revealObserver.observe(el));
-  }
+    items.forEach((el) => observer.observe(el));
+  })();
 
-  /* ------------------------------------------------------------------
-     Project filters
-     ------------------------------------------------------------------ */
-  const filters = $$('.filter');
-  const workCards = $$('#workGrid .card--work');
-  const workEmpty = $('#workEmpty');
+  /* ------------------------------------------------------------------ *
+   * 5. Project filters
+   * ------------------------------------------------------------------ */
+  (() => {
+    const buttons = [...document.querySelectorAll('.filter')];
+    const projects = [...document.querySelectorAll('#workGrid .project')];
+    const empty = document.getElementById('workEmpty');
+    if (!buttons.length || !projects.length) return;
 
-  if (filters.length && workCards.length) {
-    filters.forEach((button) => {
+    buttons.forEach((button) => {
       button.addEventListener('click', () => {
-        const target = button.dataset.filter;
+        const filter = button.dataset.filter;
 
-        filters.forEach((other) => {
-          const active = other === button;
-          other.classList.toggle('is-active', active);
-          other.setAttribute('aria-pressed', String(active));
+        buttons.forEach((b) => {
+          const active = b === button;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', String(active));
         });
 
         let shown = 0;
-        workCards.forEach((card) => {
-          const match = target === 'all' || card.dataset.category === target;
-          card.classList.toggle('is-hidden', !match);
+        projects.forEach((project) => {
+          const match = filter === 'all' || project.dataset.category === filter;
+          project.classList.toggle('is-hidden', !match);
           if (match) shown += 1;
         });
 
-        if (workEmpty) workEmpty.hidden = shown > 0;
+        if (empty) empty.hidden = shown > 0;
       });
     });
-  }
+  })();
 
-  /* ------------------------------------------------------------------
-     Footer year
-     ------------------------------------------------------------------ */
-  const year = $('#year');
+  /* ------------------------------------------------------------------ *
+   * 6. Résumé — the page's own print stylesheet does the formatting
+   * ------------------------------------------------------------------ */
+  document.querySelectorAll('[data-print]').forEach((button) => {
+    button.addEventListener('click', () => window.print());
+  });
+
+  /* ------------------------------------------------------------------ *
+   * 7. Footer year
+   * ------------------------------------------------------------------ */
+  const year = document.getElementById('year');
   if (year) year.textContent = String(new Date().getFullYear());
 
-  /* ------------------------------------------------------------------
-     Hero particle field
-     Scoped to the hero only, DPR-aware, and paused whenever it is off
-     screen or the tab is hidden so it costs nothing below the fold.
-     ------------------------------------------------------------------ */
-  const canvas = $('#heroCanvas');
-  const hero = $('.hero');
+  /* ------------------------------------------------------------------ *
+   * 8. Hero particles
+   *
+   * Slow-drifting translucent sky-blue discs. Deliberately quiet: low count,
+   * low opacity, sub-pixel speeds, no connecting lines. Skipped entirely for
+   * reduced-motion, and paused whenever the hero scrolls away or the tab is
+   * hidden so it never burns battery in the background.
+   * ------------------------------------------------------------------ */
+  (() => {
+    const canvas = document.getElementById('particles');
+    if (!canvas || reduceMotion) return;
 
-  if (canvas && hero && !prefersReducedMotion.matches) {
     const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
 
-    if (ctx) {
-      const CONFIG = {
-        density: 22000,   // one particle per N css pixels of hero area
-        maxParticles: 46,
-        linkDistance: 130,
-        speed: 0.22,
-        dotColor: 'rgba(0, 151, 167, ',
-        lineColor: 'rgba(0, 188, 212, '
-      };
+    const TINTS = ['56, 189, 248', '2, 132, 199', '125, 211, 252'];
 
-      let particles = [];
-      let width = 0;
-      let height = 0;
-      let dpr = 1;
-      let rafId = null;
-      let running = false;
+    let particles = [];
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let frame = null;
+    let onScreen = true;
 
-      const seed = () => {
-        const count = Math.min(Math.floor((width * height) / CONFIG.density), CONFIG.maxParticles);
-        particles = Array.from({ length: count }, () => ({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * CONFIG.speed,
-          vy: (Math.random() - 0.5) * CONFIG.speed,
-          r: Math.random() * 1.8 + 1,
-          a: Math.random() * 0.35 + 0.18
-        }));
-      };
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      const resize = () => {
-        const rect = hero.getBoundingClientRect();
-        width = rect.width;
-        height = rect.height;
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        canvas.width = Math.round(width * dpr);
-        canvas.height = Math.round(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        seed();
-      };
+      // Density scales with area, capped so a wide monitor stays calm.
+      const count = Math.min(Math.round((width * height) / 26000), 42);
+      particles = Array.from({ length: count }, () => spawn());
+    };
 
-      const draw = () => {
-        ctx.clearRect(0, 0, width, height);
+    const spawn = () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: 1.5 + Math.random() * 4.5,
+      // Mostly upward drift, with a lazy sideways wander.
+      vx: (Math.random() - 0.5) * 0.14,
+      vy: -(0.05 + Math.random() * 0.16),
+      alpha: 0.12 + Math.random() * 0.22,
+      tint: TINTS[Math.floor(Math.random() * TINTS.length)],
+      // Phase offset so the fade-breathing never syncs up across particles.
+      phase: Math.random() * Math.PI * 2,
+      drift: 0.15 + Math.random() * 0.4
+    });
 
-        for (let i = 0; i < particles.length; i += 1) {
-          const p = particles[i];
+    const draw = (time) => {
+      ctx.clearRect(0, 0, width, height);
 
-          p.x += p.vx;
-          p.y += p.vy;
+      particles.forEach((p) => {
+        p.x += p.vx + Math.sin(time / 3200 + p.phase) * 0.06 * p.drift;
+        p.y += p.vy;
 
-          if (p.x < -10) p.x = width + 10;
-          else if (p.x > width + 10) p.x = -10;
-          if (p.y < -10) p.y = height + 10;
-          else if (p.y > height + 10) p.y = -10;
+        // Wrap rather than respawn, so density never visibly dips.
+        if (p.y < -p.r * 2) { p.y = height + p.r * 2; p.x = Math.random() * width; }
+        if (p.x < -p.r * 2) p.x = width + p.r * 2;
+        if (p.x > width + p.r * 2) p.x = -p.r * 2;
 
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `${CONFIG.dotColor}${p.a})`;
-          ctx.fill();
+        // Slow breathing keeps it alive without ever drawing the eye.
+        const breathe = 0.75 + Math.sin(time / 2400 + p.phase) * 0.25;
 
-          // Only look forward so each pair is linked once.
-          for (let j = i + 1; j < particles.length; j += 1) {
-            const q = particles[j];
-            const dx = p.x - q.x;
-            const dy = p.y - q.y;
-            const distSq = dx * dx + dy * dy;
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        gradient.addColorStop(0, `rgba(${p.tint}, ${p.alpha * breathe})`);
+        gradient.addColorStop(1, `rgba(${p.tint}, 0)`);
 
-            if (distSq < CONFIG.linkDistance * CONFIG.linkDistance) {
-              const alpha = (1 - Math.sqrt(distSq) / CONFIG.linkDistance) * 0.16;
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(q.x, q.y);
-              ctx.strokeStyle = `${CONFIG.lineColor}${alpha})`;
-              ctx.lineWidth = 1;
-              ctx.stroke();
-            }
-          }
-        }
-
-        rafId = requestAnimationFrame(draw);
-      };
-
-      const start = () => {
-        if (running) return;
-        running = true;
-        rafId = requestAnimationFrame(draw);
-      };
-
-      const stop = () => {
-        running = false;
-        if (rafId !== null) cancelAnimationFrame(rafId);
-        rafId = null;
-      };
-
-      resize();
-      start();
-
-      const onResize = onFrame(resize);
-      window.addEventListener('resize', onResize, { passive: true });
-
-      // Stop the loop once the hero scrolls away.
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver((entries) => {
-          entries[0].isIntersecting ? start() : stop();
-        }, { threshold: 0 }).observe(hero);
-      }
-
-      document.addEventListener('visibilitychange', () => {
-        document.hidden ? stop() : start();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
       });
 
-      // Drop the animation entirely if the user turns motion off mid-session.
-      prefersReducedMotion.addEventListener('change', (e) => {
-        if (e.matches) {
-          stop();
-          ctx.clearRect(0, 0, width, height);
-        } else {
-          start();
-        }
-      });
+      frame = requestAnimationFrame(draw);
+    };
+
+    const start = () => { if (frame === null) frame = requestAnimationFrame(draw); };
+    const stop = () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = null;
+    };
+
+    const sync = () => {
+      if (onScreen && !document.hidden) start();
+      else stop();
+    };
+
+    resize();
+    sync();
+
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 180);
+    }, { passive: true });
+
+    document.addEventListener('visibilitychange', sync);
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        sync();
+      }, { threshold: 0 }).observe(canvas);
     }
-  }
+  })();
 })();
